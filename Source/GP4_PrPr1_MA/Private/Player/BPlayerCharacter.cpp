@@ -5,15 +5,18 @@
 #include "Camera/CameraComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "Framework/InteractInterface.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Weapon/Weapon.h"
 
 ABPlayerCharacter::ABPlayerCharacter()
 {
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>("CameraBoom");
 	CameraBoom->SetupAttachment(GetRootComponent());
 	CameraBoom->bUsePawnControlRotation = true;
-	CameraBoom->TargetArmLength = 1000.0f;
+	CameraBoom->TargetArmLength = CameraBoomLength;
+	CameraBoom->SetRelativeLocation(FVector(0, CamBoomYOffset, 0));
 
 	bUseControllerRotationYaw = false;
 
@@ -21,7 +24,7 @@ ABPlayerCharacter::ABPlayerCharacter()
 	ViewCam->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCharacterMovement()->RotationRate = FRotator(1200.f);
-}
+}//Target Arm Length = 500 | Socket Offset = FVector(0, 75, 0) 
 
 void ABPlayerCharacter::PawnClientRestart()
 {
@@ -47,7 +50,13 @@ void ABPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 		EnhancedInputComponent->BindAction(LookInputAction, ETriggerEvent::Triggered, this, &ABPlayerCharacter::HandleLookInput);
 		EnhancedInputComponent->BindAction(MoveInputAction, ETriggerEvent::Triggered, this, &ABPlayerCharacter::HandleMoveInput);
 		EnhancedInputComponent->BindAction(FireInputAction, ETriggerEvent::Triggered, this, &ABPlayerCharacter::HandleFireInput);
+		EnhancedInputComponent->BindAction(InteractInputAction, ETriggerEvent::Triggered, this, &ABPlayerCharacter::HandleInteractInput);
 	}
+}
+
+void ABPlayerCharacter::SetInteractable(AActor* InteractableToSet)
+{
+	Interactable = InteractableToSet;
 }
 
 void ABPlayerCharacter::HandleLookInput(const FInputActionValue& InputActionValue)
@@ -66,12 +75,48 @@ void ABPlayerCharacter::HandleMoveInput(const FInputActionValue& InputActionValu
 	}
 	InputValue.Normalize();
 
-	AddMovementInput(GetLookRightDirection() * InputValue.X + GetLookForwardDirection() * InputValue.Y);
+	AddMovementInput(GetLookRightDirection() * InputValue.X + GetMoveForwardDirection() * InputValue.Y);
 }
 
 void ABPlayerCharacter::HandleFireInput(const FInputActionValue& InputActionValue)
 {
+	//if (!CurrentWeapon)
+	//	return;
 
+	//get current weapon
+	//send values into handle fire input
+
+	float FireDistance = 20.0f;
+
+	const FVector LineStart = ViewCam->GetComponentLocation();
+	const FVector LineEnd = LineStart + ViewCam->GetForwardVector() * FireDistance;
+
+	FHitResult HitResult;
+	if (!GetWorld()->LineTraceSingleByChannel(HitResult, LineStart, LineEnd, ECC_WorldStatic))
+	{
+		return;
+	}
+
+	AActor* HitActor = HitResult.GetActor();
+	//process target
+	/*
+	if (ATarget* Target = Cast<ATarget>(HitActor))
+	{
+		//process target damage and such
+	}
+	*/
+}
+
+void ABPlayerCharacter::HandleInteractInput(const FInputActionValue& InputActionValue)
+{
+	if (!Interactable)
+		return;
+
+	IInteractInterface* InteractInterface = Cast<IInteractInterface>(Interactable);
+	if (InteractInterface)
+	{
+		InteractInterface->Interact(this);
+	}
 }
 
 FVector ABPlayerCharacter::GetLookRightDirection() const
@@ -84,7 +129,21 @@ FVector ABPlayerCharacter::GetLookForwardDirection() const
 	return ViewCam->GetForwardVector();
 }
 
-FVector ABPlayerCharacter::GetMoveRightDirection() const
+FVector ABPlayerCharacter::GetMoveForwardDirection() const
 {
 	return FVector::CrossProduct(GetLookRightDirection(), FVector::UpVector);
+}
+
+bool ABPlayerCharacter::TryCanPickup(TSubclassOf<class AActor> PickupClass)
+{
+	/*TSubclassOf<class AWeapon>* PickupWeaponClass = Cast<TSubclassOf<class AWeapon>>(PickupClass);
+	if (!PickupWeaponClass)
+		return false;
+
+	if (CurrentWeapon->IsA(PickupWeaponClass))
+		return false;//already has this as current weapon
+	*/
+	//CurrentWeapon = 
+
+	return true;
 }

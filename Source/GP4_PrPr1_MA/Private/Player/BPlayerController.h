@@ -18,6 +18,8 @@ public:
 	virtual void OnPossess(APawn* NewPawn) override;
 	virtual void AcknowledgePossession(APawn* NewPawn) override;
 
+
+
 private:
 	UPROPERTY()
 	class ABPlayerCharacter* BPlayerCharacter;
