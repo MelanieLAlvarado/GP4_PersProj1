@@ -41,4 +41,5 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
 	UImage* WeaponIcon;
+
 };
