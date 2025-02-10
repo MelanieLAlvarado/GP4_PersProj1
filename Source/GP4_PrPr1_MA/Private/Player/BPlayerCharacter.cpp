@@ -2,7 +2,8 @@
 
 
 #include "Player/BPlayerCharacter.h"
-#include "Camera/CameraComponent.h"
+#include "Camera/CameraComponent.h" 
+#include "Components/AdsComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Framework/InteractInterface.h"
@@ -15,17 +16,17 @@ ABPlayerCharacter::ABPlayerCharacter()
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>("CameraBoom");
 	CameraBoom->SetupAttachment(GetRootComponent());
 	CameraBoom->bUsePawnControlRotation = true;
-	CameraBoom->TargetArmLength = CameraBoomDefaultLength;
+	CameraBoom->TargetArmLength = 500.f;
 	CameraBoom->SetRelativeLocation(FVector(0, CamBoomYOffset, 0));
 
 	bUseControllerRotationYaw = false;
 
 	ViewCam = CreateDefaultSubobject<UCameraComponent>("View Cam");
 	ViewCam->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
-	ViewCam->SetFieldOfView(DefaultFOV);
 
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCharacterMovement()->RotationRate = FRotator(1200.f);
+	AdsComponent = CreateDefaultSubobject<UAdsComponent>("ADS Component");
 }//Target Arm Length = 500 | Socket Offset = FVector(0, 75, 0) 
 
 void ABPlayerCharacter::PawnClientRestart()
@@ -53,6 +54,9 @@ void ABPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 		EnhancedInputComponent->BindAction(MoveInputAction, ETriggerEvent::Triggered, this, &ABPlayerCharacter::HandleMoveInput);
 		EnhancedInputComponent->BindAction(FireInputAction, ETriggerEvent::Triggered, this, &ABPlayerCharacter::HandleFireInput);
 		EnhancedInputComponent->BindAction(InteractInputAction, ETriggerEvent::Triggered, this, &ABPlayerCharacter::HandleInteractInput);
+
+		if (!AdsComponent)
+			return;
 		EnhancedInputComponent->BindAction(AimInputAction, ETriggerEvent::Triggered, this, &ABPlayerCharacter::HandleAimInputHold);
 		EnhancedInputComponent->BindAction(EndAimInputAction, ETriggerEvent::Triggered, this, &ABPlayerCharacter::HandleAimInputReleased);
 	}
@@ -60,46 +64,21 @@ void ABPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 void ABPlayerCharacter::Tick(float DeltaTime)
 {
-	if (!bIsViewLerp)
-	{
-		return;
-	}
-	LerpAlpha += DeltaTime;
+}
 
-	if (bIsAiming)
-	{
-		LerpCameraBoomLength(CameraBoomDefaultLength, CameraBoomAimLength);
-		LerpFOV(DefaultFOV, AimFOV);
-		bIsViewLerp = !(CurrentFOV <= AimFOV && CameraBoomCurrentLength <= CameraBoomAimLength);
-	}
-	else
-	{
-		LerpCameraBoomLength(CameraBoomAimLength, CameraBoomDefaultLength);
-		LerpFOV(AimFOV, DefaultFOV);
-		bIsViewLerp = !(CurrentFOV >= DefaultFOV && CameraBoomCurrentLength >= CameraBoomDefaultLength);
-	}
-	ViewCam->SetFieldOfView(CurrentFOV);
+UCameraComponent* ABPlayerCharacter::GetViewCamera()
+{
+	return ViewCam;
+}
 
-	if (!bIsViewLerp)
-	{
-		LerpAlpha = 0.f;
-	}
-	UE_LOG(LogTemp, Warning,TEXT("Fov: %f"), CurrentFOV);
+USpringArmComponent* ABPlayerCharacter::GetCameraBoom()
+{
+	return CameraBoom;
 }
 
 void ABPlayerCharacter::SetInteractable(AActor* InteractableToSet)
 {
 	Interactable = InteractableToSet;
-}
-
-void ABPlayerCharacter::LerpCameraBoomLength(float StartValue, float EndValue)
-{
-	CameraBoomCurrentLength = FMath::Lerp(StartValue, EndValue, LerpAlpha);
-}
-
-void ABPlayerCharacter::LerpFOV(float StartValue, float EndValue)
-{
-	CurrentFOV = FMath::Lerp(StartValue, EndValue, LerpAlpha);
 }
 
 void ABPlayerCharacter::HandleLookInput(const FInputActionValue& InputActionValue)
@@ -161,20 +140,20 @@ void ABPlayerCharacter::HandleInteractInput(const FInputActionValue& InputAction
 		InteractInterface->Interact(this);
 	}
 }
-
 void ABPlayerCharacter::HandleAimInputHold(const FInputActionValue& InputActionValue)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Aiming hold"));
-
-	bIsAiming = true;
-	bIsViewLerp = true;
+	AdsComponent->SetIsAimingState(true);
+	GetCharacterMovement()->bOrientRotationToMovement = false;
+	bUseControllerRotationYaw = true;
 }
 
 void ABPlayerCharacter::HandleAimInputReleased(const FInputActionValue& InputActionValue)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Aiming release"));
-	bIsAiming = false;
-	bIsViewLerp = true;
+	AdsComponent->SetIsAimingState(false);
+	GetCharacterMovement()->bOrientRotationToMovement = true;
+	bUseControllerRotationYaw = false;
 }
 
 FVector ABPlayerCharacter::GetLookRightDirection() const

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Character/BCharacter.h"
+#include "Components/AdsComponent.h"
 #include "Weapon/Weapon.h"
 #include "BPlayerCharacter.generated.h"
 
@@ -23,6 +24,12 @@ public:
 
 
 	UFUNCTION()
+	UCameraComponent* GetViewCamera();
+
+	UFUNCTION()
+	USpringArmComponent* GetCameraBoom();
+
+	UFUNCTION()
 	void SetInteractable(AActor* InteractableToSet);
 
 private:
@@ -39,33 +46,8 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "View")
 	float CamBoomYOffset = 0.0f;
 	
-	UPROPERTY(EditDefaultsOnly, Category = "View")
-	float CameraBoomDefaultLength = 500.f;
-
-	UPROPERTY(EditDefaultsOnly, Category = "View")
-	float CameraBoomAimLength = 400.f;
-
-	UPROPERTY(VisibleAnywhere, Category = "View")
-	float CameraBoomCurrentLength = 500.f;
-
-	UPROPERTY(EditDefaultsOnly, Category = "View")
-	float DefaultFOV = 90.f;
-	
-	UPROPERTY(EditDefaultsOnly, Category = "View")
-	float AimFOV = 70.f;
-
-	UPROPERTY(EditDefaultsOnly, Category = "View")
-	float CurrentFOV = 90.f;
-
-	float LerpAlpha = 0.f;
-
-	void LerpCameraBoomLength(float StartValue, float EndValue);
-	void LerpFOV(float StartValue, float EndValue);
-	
-	UPROPERTY();
-	bool bIsViewLerp = false;
-	UPROPERTY();
-	bool bIsAiming = false;
+	UPROPERTY(VisibleDefaultsOnly, Category = "View")
+	class UAdsComponent* AdsComponent;
 
 	/********************
 	*		Input		*
@@ -102,7 +84,9 @@ private:
 	void HandleInteractInput(const struct FInputActionValue& InputActionValue);
 
 	void HandleAimInputHold(const struct FInputActionValue& InputActionValue);
+
 	void HandleAimInputReleased(const struct FInputActionValue& InputActionValue);
+
 
 	FVector GetLookRightDirection() const;
 
