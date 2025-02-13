@@ -68,4 +68,6 @@ private:
 	bool bIsViewLerp = false;
 	UPROPERTY();
 	bool bIsAiming = false;
+
+	void UpdateCameraLerp();
 };

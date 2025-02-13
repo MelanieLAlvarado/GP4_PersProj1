@@ -33,6 +33,8 @@ ABPlayerCharacter::ABPlayerCharacter()
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCharacterMovement()->RotationRate = FRotator(1200.f);
 	AdsComponent = CreateDefaultSubobject<UAdsComponent>("ADS Component");
+	OnWeaponUpdated.AddUObject(this, &ABPlayerCharacter::WeponUpdated);
+	OnWeaponUpdatedDynamic.AddDynamic(this, &ABPlayerCharacter::WeaponUpdatedDynamic);
 }//Target Arm Length = 500 | Socket Offset = FVector(0, 75, 0) 
 
 void ABPlayerCharacter::PawnClientRestart()
@@ -128,6 +130,7 @@ void ABPlayerCharacter::HandleFireInput(const FInputActionValue& InputActionValu
 	FHitResult HitResult;
 	DrawDebugLine(GetWorld(), LineStart, LineEnd, FColor::White, true, 3.f);
 
+	//GetWorld()->LineTraceSingleByChannel(HitResult, LineStart, LineEnd, ECC_Target);
 	
 	if (!GetWorld()->LineTraceSingleByChannel(HitResult, LineStart, LineEnd, ECC_Target))
 	{
@@ -160,6 +163,9 @@ void ABPlayerCharacter::HandleInteractInput(const FInputActionValue& InputAction
 	{
 		InteractInterface->Interact(this);
 	}
+
+	OnWeaponUpdated.Broadcast(1,2);
+	OnWeaponUpdatedDynamic.Broadcast(1,2);
 }
 void ABPlayerCharacter::HandleDropInput(const FInputActionValue& InputActionValue)
 {

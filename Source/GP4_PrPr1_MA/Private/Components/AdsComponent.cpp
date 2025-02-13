@@ -37,7 +37,7 @@ void UAdsComponent::BeginPlay()
 	Super::BeginPlay();
 
 	// ...
-	
+
 }
 
 
@@ -51,8 +51,10 @@ void UAdsComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorCo
 }
 void UAdsComponent::SetIsAimingState(bool StateToSet)
 {
+	
 	bIsAiming = StateToSet;
 	bIsViewLerp = true;
+	//GetWorld()->GetTimerManager().SetTimerForNextTick(this, &UAdsComponent::UpdateCameraLerp); // could do this instead of ticking.
 }
 
 void UAdsComponent::ProcessCameraLerp(float DeltaTime)
@@ -94,5 +96,10 @@ void UAdsComponent::LerpFOV(float StartValue, float EndValue)
 {
 	CurrentFOV = FMath::Lerp(StartValue, EndValue, LerpAlpha);
 	ViewCam->SetFieldOfView(CurrentFOV);
+}
+
+void UAdsComponent::UpdateCameraLerp()
+{
+	GetWorld()->GetTimerManager().SetTimerForNextTick(this, &UAdsComponent::UpdateCameraLerp);
 }
 
