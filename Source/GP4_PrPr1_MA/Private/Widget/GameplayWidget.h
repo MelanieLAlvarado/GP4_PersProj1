@@ -17,6 +17,8 @@ class UGameplayWidget : public UUserWidget
 public:
 	virtual void NativeConstruct() override;
 	
+
+
 private:
 	
 

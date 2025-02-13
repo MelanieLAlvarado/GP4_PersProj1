@@ -24,6 +24,7 @@ void ABPlayerController::AcknowledgePossession(APawn* NewPawn)
 	{
 		BPlayerCharacter->ClientSideInit();
 	}
+	CreateGameplayWidget();
 }
 
 void ABPlayerController::CreateGameplayWidget()

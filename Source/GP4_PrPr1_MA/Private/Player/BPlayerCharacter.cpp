@@ -4,12 +4,18 @@
 #include "Player/BPlayerCharacter.h"
 #include "Camera/CameraComponent.h" 
 #include "Components/AdsComponent.h"
+#include "CoreMinimal.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Framework/InteractInterface.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "Weapon/Weapon.h"
+#include "Kismet/GameplayStatics.h"
+#include "Pickup/Pickup.h"
+#include "Target/Target.h"
+#include "Weapon/WeaponDataAsset.h"
+
+#define ECC_Target ECC_GameTraceChannel1
 
 ABPlayerCharacter::ABPlayerCharacter()
 {
@@ -54,16 +60,21 @@ void ABPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 		EnhancedInputComponent->BindAction(MoveInputAction, ETriggerEvent::Triggered, this, &ABPlayerCharacter::HandleMoveInput);
 		EnhancedInputComponent->BindAction(FireInputAction, ETriggerEvent::Triggered, this, &ABPlayerCharacter::HandleFireInput);
 		EnhancedInputComponent->BindAction(InteractInputAction, ETriggerEvent::Triggered, this, &ABPlayerCharacter::HandleInteractInput);
+		EnhancedInputComponent->BindAction(ReloadInputAction, ETriggerEvent::Triggered, this, &ABPlayerCharacter::HandleReloadInput);
 
-		if (!AdsComponent)
-			return;
-		EnhancedInputComponent->BindAction(AimInputAction, ETriggerEvent::Triggered, this, &ABPlayerCharacter::HandleAimInputHold);
-		EnhancedInputComponent->BindAction(EndAimInputAction, ETriggerEvent::Triggered, this, &ABPlayerCharacter::HandleAimInputReleased);
+		EnhancedInputComponent->BindAction(DropCurrentInputAction, ETriggerEvent::Triggered, this, &ABPlayerCharacter::HandleDropInput);
+
+		if (AdsComponent)
+			EnhancedInputComponent->BindAction(AimInputAction, ETriggerEvent::Triggered, 
+				this, &ABPlayerCharacter::HandleAimInputHold);
+			EnhancedInputComponent->BindAction(EndAimInputAction, ETriggerEvent::Triggered, 
+				this, &ABPlayerCharacter::HandleAimInputReleased);
 	}
 }
 
 void ABPlayerCharacter::Tick(float DeltaTime)
 {
+	ProcessCurrentWeaponCanFire(DeltaTime);
 }
 
 UCameraComponent* ABPlayerCharacter::GetViewCamera()
@@ -105,28 +116,38 @@ void ABPlayerCharacter::HandleFireInput(const FInputActionValue& InputActionValu
 	if (!CurrentWeapon)
 		return;
 
-	//get current weapon
+	if (!CurrentWeapon->TryFireWeapon())
+		return;
+
 	//send values into handle fire input
+	float FireDistance = 1000.0f;
 
-	float FireDistance = 20.0f;
-
-	const FVector LineStart = ViewCam->GetComponentLocation();
+	const FVector LineStart = GetActorLocation();
 	const FVector LineEnd = LineStart + ViewCam->GetForwardVector() * FireDistance;
 
 	FHitResult HitResult;
-	if (!GetWorld()->LineTraceSingleByChannel(HitResult, LineStart, LineEnd, ECC_WorldStatic))
+	DrawDebugLine(GetWorld(), LineStart, LineEnd, FColor::White, true, 3.f);
+
+	
+	if (!GetWorld()->LineTraceSingleByChannel(HitResult, LineStart, LineEnd, ECC_Target))
 	{
+		UE_LOG(LogTemp, Warning, TEXT("no Line trace"));
+
 		return;
 	}
-
-	AActor* HitActor = HitResult.GetActor();
+	
+	DrawDebugLine(GetWorld(), LineStart, LineEnd, FColor::Red, true, 3.f);
+	UE_LOG(LogTemp, Warning, TEXT("Fired Successfully"));
 	//process target
-	/*
-	if (ATarget* Target = Cast<ATarget>(HitActor))
-	{
-		//process target damage and such
-	}
-	*/
+	AActor* HitActor = HitResult.GetActor();
+	if (!HitActor)
+		return;
+	
+	ATarget* Target = Cast<ATarget>(HitActor);
+	if (!Target)
+		return;
+
+	HitActor->Destroy();
 }
 
 void ABPlayerCharacter::HandleInteractInput(const FInputActionValue& InputActionValue)
@@ -140,6 +161,27 @@ void ABPlayerCharacter::HandleInteractInput(const FInputActionValue& InputAction
 		InteractInterface->Interact(this);
 	}
 }
+void ABPlayerCharacter::HandleDropInput(const FInputActionValue& InputActionValue)
+{
+	if (!CurrentWeapon)
+		return;
+	UWeaponDataAsset* DroppedWeapon = CurrentWeapon;
+	APickup* DroppedWeaponPickup = WeaponPickupMap[DroppedWeapon];
+
+	if (!PickupClass)
+		return;
+
+	const FVector SpawnLocation = this->GetActorLocation() + (this->GetActorForwardVector() * DropSpawnDistance);
+
+	APickup* PickupActor = GetWorld()->SpawnActor<APickup>(PickupClass, SpawnLocation, FRotator::ZeroRotator);
+
+	if (PickupActor != NULL)
+	{
+		PickupActor->InitializeWithDataAsset(DroppedWeapon);
+		CurrentWeapon = NULL;
+	}
+}
+
 void ABPlayerCharacter::HandleAimInputHold(const FInputActionValue& InputActionValue)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Aiming hold"));
@@ -154,6 +196,14 @@ void ABPlayerCharacter::HandleAimInputReleased(const FInputActionValue& InputAct
 	AdsComponent->SetIsAimingState(false);
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	bUseControllerRotationYaw = false;
+}
+
+void ABPlayerCharacter::HandleReloadInput(const FInputActionValue& InputActionValue)
+{
+	if (!CurrentWeapon)
+		return;
+
+	CurrentWeapon->ReloadWeapon();
 }
 
 FVector ABPlayerCharacter::GetLookRightDirection() const
@@ -171,16 +221,22 @@ FVector ABPlayerCharacter::GetMoveForwardDirection() const
 	return FVector::CrossProduct(GetLookRightDirection(), FVector::UpVector);
 }
 
-bool ABPlayerCharacter::TryCanPickup(TSubclassOf<class AActor> PickupClass)
+bool ABPlayerCharacter::TryCanPickup(class APickup* Pickup, UDataAsset* PickupItemClass)
 {
-	/*TSubclassOf<class AWeapon>* PickupWeaponClass = Cast<TSubclassOf<class AWeapon>>(PickupClass);
-	if (!PickupWeaponClass)
-		return false;
+	UWeaponDataAsset* WeaponData = Cast<UWeaponDataAsset>(PickupItemClass);
+	if (WeaponData && !CurrentWeapon)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Weapon Data found!"));
+		CurrentWeapon = WeaponData;
+		WeaponPickupMap.Add(WeaponData, Pickup);
 
-	if (CurrentWeapon->IsA(PickupWeaponClass))
-		return false;*///already has this as current weapon
-	
-	//CurrentWeapon = 
-
+		return true;
+	}
+	UE_LOG(LogTemp, Warning, TEXT("No Weapon"));
 	return true;
+}
+
+void ABPlayerCharacter::ProcessCurrentWeaponCanFire(float DeltaTime)//alternately handle through anim event
+{
+
 }

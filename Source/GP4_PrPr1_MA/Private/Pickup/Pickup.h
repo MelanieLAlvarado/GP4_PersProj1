@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Framework/InteractInterface.h"
+#include "Engine/DataAsset.h"
 #include "Pickup.generated.h"
 
 UCLASS()
@@ -15,6 +16,8 @@ class APickup : public AActor, public IInteractInterface
 public:	
 	// Sets default values for this actor's properties
 	APickup();
+
+	void InitializeWithDataAsset(UDataAsset* ItemData);
 
 	virtual void Interact(AActor* InteractingActor) override;
 
@@ -42,6 +45,6 @@ private:
 	UStaticMeshComponent* PickupMesh;
 	UPROPERTY(VisibleAnywhere, Category = "Pickup")
 	bool bIsActive{ false };
-	UPROPERTY(EditDefaultsOnly, Category = "Pickup")
-	TSubclassOf< class AActor> PickupItemClass;
+	UPROPERTY(EditAnywhere, Category = "Pickup")
+	UDataAsset* PickupItemClass;
 };

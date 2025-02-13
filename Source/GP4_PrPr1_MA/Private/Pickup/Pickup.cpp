@@ -5,6 +5,7 @@
 #include "Player/BPlayerCharacter.h"
 #include "Player/BPlayerController.h"
 #include "Components/SphereComponent.h"
+#include "Weapon/WeaponDataAsset.h"
 
 // Sets default values
 APickup::APickup()
@@ -24,6 +25,22 @@ APickup::APickup()
 
 	OnActorBeginOverlap.AddDynamic(this, &APickup::OnOverlapBegin);
 	OnActorEndOverlap.AddDynamic(this, &APickup::OnOverlapEnd);
+}
+
+void APickup::InitializeWithDataAsset(UDataAsset* ItemData)
+{
+	if (!ItemData)
+		return;
+
+	UWeaponDataAsset* WeaponData = Cast<UWeaponDataAsset>(ItemData);
+	if (WeaponData)
+	{
+		PickupItemClass = WeaponData;
+		PickupMesh = WeaponData->GetStaticMesh();
+		UE_LOG(LogTemp, Warning, TEXT("Handled WeaponData (Pickup)!"));
+		return;
+	}
+	UE_LOG(LogTemp, Warning, TEXT("Could not Overlap!"));
 }
 
 void APickup::Interact(AActor* InteractingActor)
@@ -76,13 +93,12 @@ void APickup::OnPickupCollected(AActor* InteractingActor)
 	if (!InteractPlayerCharacter)
 		return;
 
-	if (InteractPlayerCharacter->TryCanPickup(PickupItemClass))
+	if (InteractPlayerCharacter->TryCanPickup(this, PickupItemClass))
 	{
+//		UE_LOG(LogTemp, Warning, TEXT("Class: %hs!"), ClassName);
 		SetPickupActive(false);
 		Destroy();
 	}
-
-	UE_LOG(LogTemp, Warning, TEXT("Interacting with Pickup!"));
 	//pickup handled...
 }
 

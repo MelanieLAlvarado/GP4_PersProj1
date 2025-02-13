@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 #include "Character/BCharacter.h"
 #include "Components/AdsComponent.h"
-#include "Weapon/Weapon.h"
 #include "BPlayerCharacter.generated.h"
 
 /**
@@ -72,7 +71,13 @@ private:
 	class UInputAction* InteractInputAction;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* DropCurrentInputAction;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputAction* EndAimInputAction;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* ReloadInputAction;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputMappingContext* GameplayInputMappingContext;
@@ -83,9 +88,12 @@ private:
 	void HandleFireInput(const struct FInputActionValue& InputActionValue);
 	void HandleInteractInput(const struct FInputActionValue& InputActionValue);
 
-	void HandleAimInputHold(const struct FInputActionValue& InputActionValue);
+	void HandleDropInput(const struct FInputActionValue& InputActionValue);
 
+	void HandleAimInputHold(const struct FInputActionValue& InputActionValue);
 	void HandleAimInputReleased(const struct FInputActionValue& InputActionValue);
+
+	void HandleReloadInput(const struct FInputActionValue& InputActionValue);
 
 
 	FVector GetLookRightDirection() const;
@@ -99,16 +107,27 @@ private:
 	*********************/
 public:
 	UFUNCTION()
-	bool TryCanPickup(TSubclassOf<class AActor> PickupClass);
-private:
+	bool TryCanPickup(APickup* PickupClass, UDataAsset* PickupItemClass);
+private: 
 	UPROPERTY(VisibleAnywhere, Category = "Interact")
 	AActor* Interactable;
 
 	/********************
 	*		Weapon		*
 	*********************/
-	UPROPERTY(EditAnywhere, Category = "Weapon")
-	TSubclassOf<AWeapon> CurrentWeapon;
+	UFUNCTION(Category = "Weapon")
+	void ProcessCurrentWeaponCanFire(float DeltaTime);
 
+	UPROPERTY(EditAnywhere, Category = "Weapon")
+	class UWeaponDataAsset* CurrentWeapon;
+
+	UPROPERTY(VisibleAnywhere, Category = "Weapon")
+	TMap<UWeaponDataAsset*, class APickup*> WeaponPickupMap;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
+	TSubclassOf<APickup> PickupClass;
+
+	UPROPERTY(EditAnywhere, Category = "Weapon")
+	float DropSpawnDistance = 25.f;
 
 };

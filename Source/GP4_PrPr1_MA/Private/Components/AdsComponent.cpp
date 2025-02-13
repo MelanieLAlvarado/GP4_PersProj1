@@ -80,8 +80,8 @@ void UAdsComponent::ProcessCameraLerp(float DeltaTime)
 	{
 		LerpAlpha = 0.f;
 	}
-	UE_LOG(LogTemp, Warning, TEXT("Fov: %f"), CurrentFOV);
-	UE_LOG(LogTemp, Warning, TEXT("Boom: %f"), CameraBoomCurrentLength);
+	/*UE_LOG(LogTemp, Warning, TEXT("Fov: %f"), CurrentFOV);
+	UE_LOG(LogTemp, Warning, TEXT("Boom: %f"), CameraBoomCurrentLength);*/
 }
 
 void UAdsComponent::LerpCameraBoomLength(float StartValue, float EndValue)

@@ -5,5 +5,8 @@
 
 void UGameplayWidget::NativeConstruct()
 {
+	Super::NativeConstruct();
+
+
 
 }
