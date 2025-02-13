@@ -171,6 +171,10 @@ void ABPlayerCharacter::HandleDropInput(const FInputActionValue& InputActionValu
 	if (!PickupClass)
 		return;
 
+	FActorSpawnParameters ActorSpawnParams;
+	
+	ActorSpawnParams.SpawnCollisionHandlingOverride;
+
 	const FVector SpawnLocation = this->GetActorLocation() + (this->GetActorForwardVector() * DropSpawnDistance);
 
 	APickup* PickupActor = GetWorld()->SpawnActor<APickup>(PickupClass, SpawnLocation, FRotator::ZeroRotator);
@@ -178,6 +182,7 @@ void ABPlayerCharacter::HandleDropInput(const FInputActionValue& InputActionValu
 	if (PickupActor != NULL)
 	{
 		PickupActor->InitializeWithDataAsset(DroppedWeapon);
+		//PickupActor->SetPickupActive(true);
 		CurrentWeapon = NULL;
 	}
 }
