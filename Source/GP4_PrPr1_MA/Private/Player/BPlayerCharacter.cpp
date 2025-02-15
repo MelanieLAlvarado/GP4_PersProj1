@@ -33,8 +33,8 @@ ABPlayerCharacter::ABPlayerCharacter()
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCharacterMovement()->RotationRate = FRotator(1200.f);
 	AdsComponent = CreateDefaultSubobject<UAdsComponent>("ADS Component");
-	OnWeaponUpdated.AddUObject(this, &ABPlayerCharacter::WeponUpdated);
-	OnWeaponUpdatedDynamic.AddDynamic(this, &ABPlayerCharacter::WeaponUpdatedDynamic);
+	//OnWeaponUpdated.AddUObject(this, &ABPlayerCharacter::WeponUpdated);
+	//OnWeaponUpdatedDynamic.AddDynamic(this, &ABPlayerCharacter::WeaponUpdatedDynamic);
 }//Target Arm Length = 500 | Socket Offset = FVector(0, 75, 0) 
 
 void ABPlayerCharacter::PawnClientRestart()
@@ -124,22 +124,11 @@ void ABPlayerCharacter::HandleFireInput(const FInputActionValue& InputActionValu
 	//send values into handle fire input
 	float FireDistance = 1000.0f;
 
-	const FVector LineStart = GetActorLocation();
-	const FVector LineEnd = LineStart + ViewCam->GetForwardVector() * FireDistance;
-
 	FHitResult HitResult;
-	DrawDebugLine(GetWorld(), LineStart, LineEnd, FColor::White, true, 3.f);
-
-	//GetWorld()->LineTraceSingleByChannel(HitResult, LineStart, LineEnd, ECC_Target);
-	
-	if (!GetWorld()->LineTraceSingleByChannel(HitResult, LineStart, LineEnd, ECC_Target))
+	if (!CalculateFireResult(HitResult))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("no Line trace"));
-
 		return;
-	}
-	
-	DrawDebugLine(GetWorld(), LineStart, LineEnd, FColor::Red, true, 3.f);
+	}	
 	UE_LOG(LogTemp, Warning, TEXT("Fired Successfully"));
 	//process target
 	AActor* HitActor = HitResult.GetActor();
@@ -164,8 +153,8 @@ void ABPlayerCharacter::HandleInteractInput(const FInputActionValue& InputAction
 		InteractInterface->Interact(this);
 	}
 
-	OnWeaponUpdated.Broadcast(1,2);
-	OnWeaponUpdatedDynamic.Broadcast(1,2);
+	//OnWeaponUpdated.Broadcast(1,2);
+	//OnWeaponUpdatedDynamic.Broadcast(1,2);
 }
 void ABPlayerCharacter::HandleDropInput(const FInputActionValue& InputActionValue)
 {
@@ -244,6 +233,29 @@ bool ABPlayerCharacter::TryCanPickup(class APickup* Pickup, UDataAsset* PickupIt
 		return true;
 	}
 	UE_LOG(LogTemp, Warning, TEXT("No Weapon"));
+	return true;
+}
+
+bool ABPlayerCharacter::CalculateFireResult(FHitResult HitResult)
+{
+	float FireDistance = 1000.0f;
+
+	const FVector CamLineStart = ViewCam->GetComponentLocation();
+	const FVector CamLineEnd = CamLineStart + ViewCam->GetForwardVector() * FireDistance;
+	if (!GetWorld()->LineTraceSingleByChannel(HitResult, CamLineStart, CamLineEnd, ECC_Target))
+	{
+		return false;
+	}
+	DrawDebugLine(GetWorld(), CamLineStart, CamLineEnd, FColor::Blue, true, 3.f);
+
+	const FVector PlayerLineStart = GetActorLocation();
+	const FVector PlayerLineEnd = HitResult.ImpactPoint;
+
+	if (!GetWorld()->LineTraceSingleByChannel(HitResult, PlayerLineStart, PlayerLineEnd, ECC_Target))
+	{
+		return false;
+	}
+	DrawDebugLine(GetWorld(), PlayerLineEnd, PlayerLineStart, FColor::Red, true, 3.f);
 	return true;
 }
 

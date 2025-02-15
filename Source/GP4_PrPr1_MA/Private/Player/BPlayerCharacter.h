@@ -7,8 +7,8 @@
 #include "Components/AdsComponent.h"
 #include "BPlayerCharacter.generated.h"
 
-DECLARE_MULTICAST_DELEGATE_TwoParams(FOnWeaponUpdated, int /*maxCount*/, int);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnWeaponUpdatedDynamic, int, MaxCount, int, Value);
+//DECLARE_MULTICAST_DELEGATE_TwoParams(FOnWeaponUpdated, int /*maxCount*/, int);
+//DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnWeaponUpdatedDynamic, int, MaxCount, int, Value);
 
 /**
  * 
@@ -24,13 +24,13 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 	
-	FOnWeaponUpdated OnWeaponUpdated;
-	void WeponUpdated(int a, int b);
+	//FOnWeaponUpdated OnWeaponUpdated;
+	//void WeponUpdated(int a, int b);
 
-	UFUNCTION()
-	void WeaponUpdatedDynamic(int a, int b);
+	//UFUNCTION()
+	//void WeaponUpdatedDynamic(int a, int b);
 
-	FOnWeaponUpdatedDynamic OnWeaponUpdatedDynamic;
+	//FOnWeaponUpdatedDynamic OnWeaponUpdatedDynamic;
 
 	UFUNCTION()
 	UCameraComponent* GetViewCamera();
@@ -125,6 +125,8 @@ private:
 	/********************
 	*		Weapon		*
 	*********************/
+	bool CalculateFireResult(FHitResult HitResultToCheck);
+
 	UFUNCTION(Category = "Weapon")
 	void ProcessCurrentWeaponCanFire(float DeltaTime);
 
