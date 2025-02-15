@@ -10,9 +10,9 @@ void UWeaponInfoWidget::NativePreConstruct()
 	Super::NativePreConstruct();
 }
 
-void UWeaponInfoWidget::InitializeWithCurrentWeapon(UWeaponDataAsset* WeaponData)
+void UWeaponInfoWidget::InitializeWithCurrentWeapon(AWeaponPickup* WeaponPickup)
 {
-	if (!WeaponData)
+	/*if (!WeaponPickup)
 		return;
 
 	bool bFound = false;
@@ -23,10 +23,10 @@ void UWeaponInfoWidget::InitializeWithCurrentWeapon(UWeaponDataAsset* WeaponData
 	{
 		SetValue(NewValue, NewMaxValue);
 	}
-
+	*/
 }
 
-void UWeaponInfoWidget::UpdateWithCurrentWeapon(UWeaponDataAsset* WeaponData)
+void UWeaponInfoWidget::UpdateWithCurrentWeapon(AWeaponPickup* WeaponPickup)
 {
 
 }
@@ -46,12 +46,12 @@ void UWeaponInfoWidget::SetValue(int NewValue, int NewMaxValue)
 	);
 }
 
-void UWeaponInfoWidget::ValueChanged(UWeaponDataAsset* WeaponData)
+void UWeaponInfoWidget::ValueChanged(AWeaponPickup* WeaponPickup)
 {
-	SetValue(WeaponData->GetCurrentAmmo(), CachedMaxValue);
+	//SetValue(WeaponData->GetCurrentAmmo(), CachedMaxValue);
 }
 
-void UWeaponInfoWidget::MaxValueChanged(UWeaponDataAsset* WeaponData)
+void UWeaponInfoWidget::MaxValueChanged(AWeaponPickup* WeaponPickup)
 {
-	SetValue(CachedValue, WeaponData->GetMaxAmmo());
+	//SetValue(CachedValue, WeaponData->GetMaxAmmo());
 }

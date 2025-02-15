@@ -18,32 +18,18 @@ class UWeaponDataAsset : public UDataAsset
 
 public:
 	UFUNCTION()
-	void UpdateWeaponWidget(APickup* ParentPickup);
-
-	UFUNCTION()
-	bool TryFireWeapon();
-	UFUNCTION()
-	void ReloadWeapon();
-
-	UFUNCTION()
 	float GetDamageToDeal() { return DamageToDeal; };
 
 	UFUNCTION()
-	int GetMaxAmmo() { return MaxAmmo; };
+	const int GetMaxAmmo() { return MaxAmmo; };
 
 	UFUNCTION()
-	int GetCurrentAmmo() { return CurrentAmmo; };
-
-	UFUNCTION()
-	UImage* GetWeaponIcon() { return WeaponIcon; };
+	const UImage* GetWeaponIcon() { return WeaponIcon; };
 
 	UFUNCTION()
 	UStaticMeshComponent* GetStaticMesh() { return PickupMesh; };
 
 protected:
-	UPROPERTY(VisibleAnywhere, Category = "Weapon")
-	bool bCanFire;
-
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
 	float DamageToDeal;
 
@@ -51,10 +37,7 @@ protected:
 	int MaxAmmo;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
-	int CurrentAmmo;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
-	UImage* WeaponIcon;
+	const UImage* WeaponIcon;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Pickup")
 	UStaticMeshComponent* PickupMesh;

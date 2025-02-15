@@ -27,20 +27,11 @@ APickup::APickup()
 	OnActorEndOverlap.AddDynamic(this, &APickup::OnOverlapEnd);
 }
 
-void APickup::InitializeWithDataAsset(UDataAsset* ItemData)
+void APickup::InitializeWithDataAsset()
 {
-	if (!ItemData)
+	if (!PickupItemClass)
 		return;
 
-	UWeaponDataAsset* WeaponData = Cast<UWeaponDataAsset>(ItemData);
-	if (WeaponData)
-	{
-		PickupItemClass = WeaponData;
-		PickupMesh = WeaponData->GetStaticMesh();
-		UE_LOG(LogTemp, Warning, TEXT("Handled WeaponData (Pickup)!"));
-		return;
-	}
-	UE_LOG(LogTemp, Warning, TEXT("Could not Overlap!"));
 }
 
 void APickup::Interact(AActor* InteractingActor)
@@ -96,7 +87,7 @@ void APickup::OnPickupCollected(AActor* InteractingActor)
 	if (!InteractPlayerCharacter)
 		return;
 
-	if (InteractPlayerCharacter->TryCanPickup(this, PickupItemClass))
+	if (InteractPlayerCharacter->TryCanPickup(this))
 	{
 //		UE_LOG(LogTemp, Warning, TEXT("Class: %hs!"), ClassName);
 		SetPickupActive(false);

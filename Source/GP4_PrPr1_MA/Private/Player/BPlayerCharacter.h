@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Character/BCharacter.h"
 #include "Components/AdsComponent.h"
+#include "Weapon/WeaponPickup.h"
 #include "BPlayerCharacter.generated.h"
 
 //DECLARE_MULTICAST_DELEGATE_TwoParams(FOnWeaponUpdated, int /*maxCount*/, int);
@@ -117,7 +118,7 @@ private:
 	*********************/
 public:
 	UFUNCTION()
-	bool TryCanPickup(APickup* PickupClass, UDataAsset* PickupItemClass);
+	bool TryCanPickup(APickup* PickupClass);
 private: 
 	UPROPERTY(VisibleAnywhere, Category = "Interact")
 	AActor* Interactable;
@@ -131,13 +132,10 @@ private:
 	void ProcessCurrentWeaponCanFire(float DeltaTime);
 
 	UPROPERTY(EditAnywhere, Category = "Weapon")
-	class UWeaponDataAsset* CurrentWeapon;
+	AWeaponPickup* CurrentWeapon;
 
 	UPROPERTY(VisibleAnywhere, Category = "Weapon")
-	TMap<UWeaponDataAsset*, class APickup*> WeaponPickupMap;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
-	TSubclassOf<APickup> PickupClass;
+	TArray<AWeaponPickup*> WeaponPickupArray;
 
 	UPROPERTY(EditAnywhere, Category = "Weapon")
 	float DropSpawnDistance = 25.f;

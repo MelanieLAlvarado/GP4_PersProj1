@@ -160,11 +160,6 @@ void ABPlayerCharacter::HandleDropInput(const FInputActionValue& InputActionValu
 {
 	if (!CurrentWeapon)
 		return;
-	UWeaponDataAsset* DroppedWeapon = CurrentWeapon;
-	APickup* DroppedWeaponPickup = WeaponPickupMap[DroppedWeapon];
-
-	if (!PickupClass)
-		return;
 
 	FActorSpawnParameters ActorSpawnParams;
 	
@@ -172,12 +167,11 @@ void ABPlayerCharacter::HandleDropInput(const FInputActionValue& InputActionValu
 
 	const FVector SpawnLocation = this->GetActorLocation() + (this->GetActorForwardVector() * DropSpawnDistance);
 
-	APickup* PickupActor = GetWorld()->SpawnActor<APickup>(PickupClass, SpawnLocation, FRotator::ZeroRotator);
+	APickup* PickupActor = GetWorld()->SpawnActor<APickup>(CurrentWeapon->GetClass(), SpawnLocation, FRotator::ZeroRotator);
 
 	if (PickupActor != NULL)
 	{
-		PickupActor->InitializeWithDataAsset(DroppedWeapon);
-		//PickupActor->SetPickupActive(true);
+		PickupActor->InitializeWithDataAsset();
 		CurrentWeapon = NULL;
 	}
 }
@@ -221,19 +215,21 @@ FVector ABPlayerCharacter::GetMoveForwardDirection() const
 	return FVector::CrossProduct(GetLookRightDirection(), FVector::UpVector);
 }
 
-bool ABPlayerCharacter::TryCanPickup(class APickup* Pickup, UDataAsset* PickupItemClass)
+bool ABPlayerCharacter::TryCanPickup(class APickup* Pickup)
 {
-	UWeaponDataAsset* WeaponData = Cast<UWeaponDataAsset>(PickupItemClass);
-	if (WeaponData && !CurrentWeapon)
+	AWeaponPickup* WeaponPickup = Cast<AWeaponPickup>(Pickup);
+	
+	//DropCurrent Weapon?
+	
+	if (WeaponPickup)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Weapon Data found!"));
-		CurrentWeapon = WeaponData;
-		WeaponPickupMap.Add(WeaponData, Pickup);
-
+		UE_LOG(LogTemp, Warning, TEXT("Weapon found!"));
+		CurrentWeapon = WeaponPickup;
+		WeaponPickupArray.Add(WeaponPickup);
 		return true;
 	}
-	UE_LOG(LogTemp, Warning, TEXT("No Weapon"));
-	return true;
+	UE_LOG(LogTemp, Warning, TEXT("Cannot Pickup"));
+	return false;
 }
 
 bool ABPlayerCharacter::CalculateFireResult(FHitResult HitResult)

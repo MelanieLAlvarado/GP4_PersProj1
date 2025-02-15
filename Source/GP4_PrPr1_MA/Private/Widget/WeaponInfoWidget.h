@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "Weapon/WeaponDataAsset.h"
+#include "Weapon/WeaponPickup.h"
 #include "WeaponInfoWidget.generated.h"
 
 /**
@@ -17,8 +17,8 @@ class UWeaponInfoWidget : public UUserWidget
 	
 public:
 	virtual void NativePreConstruct() override;
-	void InitializeWithCurrentWeapon(UWeaponDataAsset* WeaponData);
-	void UpdateWithCurrentWeapon(UWeaponDataAsset* WeaponData);
+	void InitializeWithCurrentWeapon(AWeaponPickup* WeaponPickup);
+	void UpdateWithCurrentWeapon(AWeaponPickup* WeaponPickup);
 
 	/*UPROPERTY(BlueprintAssignable)
 	FOnWeaponStatusChanged OnWeaponAmmoChanged;*/
@@ -33,8 +33,8 @@ private:
 	UPROPERTY(meta=(BindWidget))
 	class UTextBlock* ValueText;
 
-	void ValueChanged(UWeaponDataAsset* WeaponData);
-	void MaxValueChanged(UWeaponDataAsset* WeaponData);
+	void ValueChanged(AWeaponPickup* WeaponPickup);
+	void MaxValueChanged(AWeaponPickup* WeaponPickup);
 
 	float CachedValue;
 	float CachedMaxValue;

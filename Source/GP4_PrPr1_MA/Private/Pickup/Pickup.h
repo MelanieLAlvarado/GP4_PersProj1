@@ -17,7 +17,7 @@ public:
 	// Sets default values for this actor's properties
 	APickup();
 
-	void InitializeWithDataAsset(UDataAsset* ItemData);
+	virtual void InitializeWithDataAsset();
 
 	virtual void Interact(AActor* InteractingActor) override;
 
@@ -41,6 +41,7 @@ private:
 	UFUNCTION()
 	void OnPickupCollected(AActor* InteractingActor);
 
+protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Pickup")
 	UStaticMeshComponent* PickupMesh;
 	UPROPERTY(VisibleAnywhere, Category = "Pickup")
