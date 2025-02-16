@@ -26,9 +26,26 @@ void UWeaponInfoWidget::InitializeWithCurrentWeapon(AWeaponPickup* WeaponPickup)
 	*/
 }
 
-void UWeaponInfoWidget::UpdateWithCurrentWeapon(AWeaponPickup* WeaponPickup)
+void UWeaponInfoWidget::WeaponUpdated(UWeaponDataAsset* WeaponData, int CurrentAmmoValue)
 {
+	if (WeaponData == NULL)
+	{
+		Icon->SetBrushFromTexture(NULL);
+		ResetValue();
+		return;
+	}
 
+	if (WeaponData->GetWeaponIcon())
+	{
+		UTexture2D* WeaponIconTexture = WeaponData->GetWeaponIcon();
+		Icon->SetBrushFromTexture(WeaponIconTexture);
+	}
+	SetValue(CurrentAmmoValue, WeaponData->GetMaxAmmo());
+}
+
+void UWeaponInfoWidget::ResetValue()
+{
+	ValueText->SetText(FText::FromString(""));
 }
 
 void UWeaponInfoWidget::SetValue(int NewValue, int NewMaxValue)

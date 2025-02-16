@@ -4,12 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "Weapon/WeaponDataAsset.h"
 #include "Weapon/WeaponPickup.h"
 #include "WeaponInfoWidget.generated.h"
 
 /**
  * 
- *///DECLARE_MULTICAST_DELEGATE_OneParam(FOnWeaponStatusChanged, AWeaponDataAsset /*NewCurrentAmmo*/);
+ *///
 UCLASS()
 class UWeaponInfoWidget : public UUserWidget
 {
@@ -18,13 +19,11 @@ class UWeaponInfoWidget : public UUserWidget
 public:
 	virtual void NativePreConstruct() override;
 	void InitializeWithCurrentWeapon(AWeaponPickup* WeaponPickup);
-	void UpdateWithCurrentWeapon(AWeaponPickup* WeaponPickup);
 
-	/*UPROPERTY(BlueprintAssignable)
-	FOnWeaponStatusChanged OnWeaponAmmoChanged;*/
+	void WeaponUpdated(UWeaponDataAsset* WeaponData, int CurrentAmmoValue);
 
 private:
-
+	void ResetValue();
 	void SetValue(int NewValue, int NewMaxValue);
 
 	UPROPERTY(meta = (BindWidget))

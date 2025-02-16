@@ -38,5 +38,6 @@ void ABPlayerController::CreateGameplayWidget()
 	if (GameplayWidget)
 	{
 		GameplayWidget->AddToViewport();
+		BPlayerCharacter->InitializeWeaponComponentUI(GameplayWidget);
 	}
 }

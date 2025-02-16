@@ -24,7 +24,7 @@ public:
 	const int GetMaxAmmo() { return MaxAmmo; };
 
 	UFUNCTION()
-	const UImage* GetWeaponIcon() { return WeaponIcon; };
+	UTexture2D* GetWeaponIcon() { return WeaponIconTexture; };
 
 	UFUNCTION()
 	UStaticMesh* GetStaticMesh() { return PickupMesh; };
@@ -36,9 +36,13 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
 	int MaxAmmo;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
-	const UImage* WeaponIcon;
+	/*UPROPERTY(EditDefaultsOnly, Category = "Weapon")
+	const UImage* WeaponIcon;*/
 
-	UPROPERTY(EditDefaultsOnly, Category = "Pickup")
+
+	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
+	UTexture2D* WeaponIconTexture;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
 	UStaticMesh* PickupMesh;
 };

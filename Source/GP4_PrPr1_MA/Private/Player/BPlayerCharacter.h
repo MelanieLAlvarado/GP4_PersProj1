@@ -7,6 +7,7 @@
 #include "Components/AdsComponent.h"
 #include "Weapon/WeaponComponent.h"
 #include "Weapon/WeaponPickup.h"
+#include "Widget/GameplayWidget.h"
 #include "BPlayerCharacter.generated.h"
 
 //DECLARE_MULTICAST_DELEGATE_TwoParams(FOnWeaponUpdated, int /*maxCount*/, int);
@@ -33,6 +34,9 @@ public:
 	//void WeaponUpdatedDynamic(int a, int b);
 
 	//FOnWeaponUpdatedDynamic OnWeaponUpdatedDynamic;
+
+	UFUNCTION()
+	void InitializeWeaponComponentUI(UGameplayWidget* GameplayWidget);
 
 	UFUNCTION()
 	UCameraComponent* GetViewCamera();

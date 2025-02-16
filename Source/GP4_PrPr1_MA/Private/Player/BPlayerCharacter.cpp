@@ -4,6 +4,7 @@
 #include "Player/BPlayerCharacter.h"
 #include "Camera/CameraComponent.h" 
 #include "Components/AdsComponent.h"
+#include "Weapon/WeaponComponent.h"
 #include "CoreMinimal.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
@@ -14,6 +15,7 @@
 #include "Pickup/Pickup.h"
 #include "Target/Target.h"
 #include "Weapon/WeaponDataAsset.h"
+#include "Widget/WeaponInfoWidget.h"
 
 #define ECC_Target ECC_GameTraceChannel1
 
@@ -78,6 +80,18 @@ void ABPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 void ABPlayerCharacter::Tick(float DeltaTime)
 {
 
+}
+
+void ABPlayerCharacter::InitializeWeaponComponentUI(UGameplayWidget* GameplayWidget)
+{
+	if (!WeaponComponent)
+		return;
+
+	UWeaponInfoWidget* WeaponWidget = GameplayWidget->GetWeaponInfoWidget();
+	if (!WeaponWidget)
+		return;
+
+	WeaponComponent->SetWeaponInfoWidget(WeaponWidget);
 }
 
 UCameraComponent* ABPlayerCharacter::GetViewCamera()

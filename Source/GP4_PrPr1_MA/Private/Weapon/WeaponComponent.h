@@ -6,7 +6,10 @@
 #include "Components/ActorComponent.h"
 #include "Weapon/WeaponDataAsset.h"
 #include "Weapon/WeaponPickup.h"
+#include "Widget/WeaponInfoWidget.h"
 #include "WeaponComponent.generated.h"
+
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnWeaponChanged, UWeaponDataAsset* /*NewCurrentAmmo*/, int /*CurrentAmmo*/);
 
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -18,6 +21,8 @@ public:
 	// Sets default values for this component's properties
 	UWeaponComponent();
 
+	FOnWeaponChanged OnWeaponUpdated;
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -25,7 +30,10 @@ protected:
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-	
+
+	UFUNCTION()
+	void SetWeaponInfoWidget(UWeaponInfoWidget* WeaponWidget);
+
 	UFUNCTION()
 	void SetCurrentWeapon(AWeaponPickup* RecievedWeaponPickup);
 
@@ -42,6 +50,9 @@ public:
 	UFUNCTION()
 	UWeaponDataAsset* GetCurrentWeaponData() { return WeaponData; };
 private:
+	UPROPERTY()
+	UWeaponInfoWidget* WeaponInfoWidget;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
 	int CurrentAmmo;
 

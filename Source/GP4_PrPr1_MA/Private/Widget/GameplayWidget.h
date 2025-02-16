@@ -17,9 +17,11 @@ class UGameplayWidget : public UUserWidget
 public:
 	virtual void NativeConstruct() override;
 	
-
+	UFUNCTION()
+	UWeaponInfoWidget* GetWeaponInfoWidget() { return WeaponWidget; };
 
 private:
-	
+	UPROPERTY(meta = (BindWidget))
+	class UWeaponInfoWidget* WeaponWidget;
 
 };

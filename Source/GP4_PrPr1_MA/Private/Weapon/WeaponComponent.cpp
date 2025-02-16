@@ -1,6 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
+#include "CoreMinimal.h"
 #include "Weapon/WeaponComponent.h"
 
 // Sets default values for this component's properties
@@ -20,7 +20,7 @@ void UWeaponComponent::BeginPlay()
 	Super::BeginPlay();
 
 	// ...
-	
+
 }
 
 
@@ -32,17 +32,26 @@ void UWeaponComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 	// ...
 }
 
+void UWeaponComponent::SetWeaponInfoWidget(UWeaponInfoWidget* WeaponWidget)
+{
+	WeaponInfoWidget = WeaponWidget;
+	if (WeaponInfoWidget)
+	{
+		OnWeaponUpdated.AddUObject(WeaponInfoWidget, &UWeaponInfoWidget::WeaponUpdated);
+	}
+}
+
 void UWeaponComponent::SetCurrentWeapon(AWeaponPickup* ReceivedWeaponPickup)
 {
 	WeaponPickupClass = ReceivedWeaponPickup->GetClass();
 	WeaponData = ReceivedWeaponPickup->GetWeaponData();
 	CurrentAmmo = ReceivedWeaponPickup->GetCurrentAmmo();
-	UpdateWeaponWidget();//?? or delegates
+	UpdateWeaponWidget();
 }
 
 void UWeaponComponent::UpdateWeaponWidget()
 {
-	//use connected delegates to send all weaponData ui info
+	OnWeaponUpdated.Broadcast(WeaponData, CurrentAmmo);
 }
 
 bool UWeaponComponent::TryFireWeapon()
@@ -69,6 +78,7 @@ bool UWeaponComponent::TryFireWeapon()
 	//bCanFire = false;
 
 	CurrentAmmo--;
+	UpdateWeaponWidget();
 	UE_LOG(LogTemp, Warning, TEXT("%i / %i"), CurrentAmmo, WeaponData->GetMaxAmmo());
 	return true;
 }
@@ -82,6 +92,7 @@ void UWeaponComponent::ReloadWeapon()
 		return;
 
 	CurrentAmmo = WeaponData->GetMaxAmmo();
+	UpdateWeaponWidget();
 	UE_LOG(LogTemp, Warning, TEXT("%i / %i"), CurrentAmmo, WeaponData->GetMaxAmmo());
 }
 
@@ -104,5 +115,6 @@ void UWeaponComponent::TryDropCurrentWeapon(float DropSpawnDistance)
 		PickupActor->SetCurrentAmmo(CurrentAmmo);
 		CurrentAmmo = 0;
 		WeaponData = NULL;
+		UpdateWeaponWidget();
 	}
 }
