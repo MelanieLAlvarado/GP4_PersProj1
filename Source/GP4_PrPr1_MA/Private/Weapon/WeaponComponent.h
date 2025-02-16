@@ -45,7 +45,7 @@ public:
 	UFUNCTION()
 	void ReloadWeapon();
 	UFUNCTION()
-	void TryDropCurrentWeapon(float DropSpawnDistance);
+	void TryDropCurrentWeapon();
 
 	UFUNCTION()
 	UWeaponDataAsset* GetCurrentWeaponData() { return WeaponData; };
@@ -56,12 +56,15 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
 	int CurrentAmmo;
 
+	UPROPERTY(EditAnywhere, Category = "Weapon")
+	float DropSpawnDistance = 25.f;
+
 	UPROPERTY(VisibleAnywhere, Category = "Weapon")
 	bool bCanFire = true;
 
 	UPROPERTY(VisibleAnywhere, Category = "Weapon")
 	UWeaponDataAsset* WeaponData;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
+	UPROPERTY(VisibleAnywhere, Category = "Weapon")
 	TSubclassOf<class AWeaponPickup> WeaponPickupClass;
 };

@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "CoreMinimal.h"
 #include "Weapon/WeaponComponent.h"
+#include "CoreMinimal.h"
 
 // Sets default values for this component's properties
 UWeaponComponent::UWeaponComponent()
@@ -43,6 +43,8 @@ void UWeaponComponent::SetWeaponInfoWidget(UWeaponInfoWidget* WeaponWidget)
 
 void UWeaponComponent::SetCurrentWeapon(AWeaponPickup* ReceivedWeaponPickup)
 {
+	TryDropCurrentWeapon();
+
 	WeaponPickupClass = ReceivedWeaponPickup->GetClass();
 	WeaponData = ReceivedWeaponPickup->GetWeaponData();
 	CurrentAmmo = ReceivedWeaponPickup->GetCurrentAmmo();
@@ -56,26 +58,14 @@ void UWeaponComponent::UpdateWeaponWidget()
 
 bool UWeaponComponent::TryFireWeapon()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Try Fire..."));
-	//UE_LOG(LogTemp, Warning, TEXT("WD: %s"), WeaponData->GetName());
 	if (!bCanFire || !WeaponData)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("failed first if"));
 		return false;
-	}
 
 	if (CurrentAmmo <= 0)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("No Ammo!"));
 		return false;
-	}
 
 	if (CurrentAmmo > WeaponData->GetMaxAmmo())
 		CurrentAmmo = WeaponData->GetMaxAmmo();
-
-	UE_LOG(LogTemp, Warning, TEXT("Try Fire successful"));
-
-	//bCanFire = false;
 
 	CurrentAmmo--;
 	UpdateWeaponWidget();
@@ -96,8 +86,10 @@ void UWeaponComponent::ReloadWeapon()
 	UE_LOG(LogTemp, Warning, TEXT("%i / %i"), CurrentAmmo, WeaponData->GetMaxAmmo());
 }
 
-void UWeaponComponent::TryDropCurrentWeapon(float DropSpawnDistance)
+void UWeaponComponent::TryDropCurrentWeapon()
 {
+	if (!WeaponPickupClass || !WeaponData)
+		return;
 	FActorSpawnParameters ActorSpawnParams;
 
 	ActorSpawnParams.SpawnCollisionHandlingOverride;

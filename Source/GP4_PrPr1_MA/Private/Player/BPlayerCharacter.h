@@ -137,7 +137,4 @@ private:
 
 	bool CalculateFireResult(FHitResult HitResultToCheck);
 
-	UPROPERTY(EditAnywhere, Category = "Weapon")
-	float DropSpawnDistance = 25.f;
-
 };

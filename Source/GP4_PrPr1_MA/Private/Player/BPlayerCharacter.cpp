@@ -176,26 +176,11 @@ void ABPlayerCharacter::HandleDropInput(const FInputActionValue& InputActionValu
 	if (!WeaponComponent || !WeaponComponent->GetCurrentWeaponData())
 		return;
 
-	WeaponComponent->TryDropCurrentWeapon(DropSpawnDistance);
-
-	/*FActorSpawnParameters ActorSpawnParams;
-	
-	ActorSpawnParams.SpawnCollisionHandlingOverride;
-
-	const FVector SpawnLocation = this->GetActorLocation() + (this->GetActorForwardVector() * DropSpawnDistance);
-
-	APickup* PickupActor = GetWorld()->SpawnActor<APickup>(CurrentWeapon->GetClass(), SpawnLocation, FRotator::ZeroRotator);
-
-	if (PickupActor != NULL)
-	{
-		PickupActor->InitializeWithDataAsset();
-		CurrentWeapon = NULL;
-	}*/
+	WeaponComponent->TryDropCurrentWeapon();
 }
 
 void ABPlayerCharacter::HandleAimInputHold(const FInputActionValue& InputActionValue)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Aiming hold"));
 	AdsComponent->SetIsAimingState(true);
 	GetCharacterMovement()->bOrientRotationToMovement = false;
 	bUseControllerRotationYaw = true;
@@ -203,7 +188,6 @@ void ABPlayerCharacter::HandleAimInputHold(const FInputActionValue& InputActionV
 
 void ABPlayerCharacter::HandleAimInputReleased(const FInputActionValue& InputActionValue)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Aiming release"));
 	AdsComponent->SetIsAimingState(false);
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	bUseControllerRotationYaw = false;
@@ -235,14 +219,10 @@ FVector ABPlayerCharacter::GetMoveForwardDirection() const
 bool ABPlayerCharacter::TryCanPickup(class APickup* Pickup)
 {
 	AWeaponPickup* WeaponPickup = Cast<AWeaponPickup>(Pickup);
-	
-	//DropCurrent Weapon?
-	
 	if (WeaponPickup && WeaponComponent)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Weapon found!"));
 		WeaponComponent->SetCurrentWeapon(WeaponPickup);
-		//WeaponPickupArray.Add(WeaponPickup);
 		return true;
 	}
 	UE_LOG(LogTemp, Warning, TEXT("Cannot Pickup"));
