@@ -22,18 +22,12 @@ public:
 	virtual void InitializeWithDataAsset() override;
 
 	UFUNCTION()
-	void UpdateWeaponWidget();
-
-	UFUNCTION()
 	int GetCurrentAmmo() { return CurrentAmmo; };
+	UFUNCTION()
+	void SetCurrentAmmo(int NewCurrentAmmo) { CurrentAmmo = NewCurrentAmmo; };
 
 	UFUNCTION()
 	UWeaponDataAsset* GetWeaponData() { return WeaponData; }
-
-	UFUNCTION()
-	bool TryFireWeapon();
-	UFUNCTION()
-	void ReloadWeapon();
 
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon")

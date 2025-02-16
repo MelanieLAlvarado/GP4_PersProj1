@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Character/BCharacter.h"
 #include "Components/AdsComponent.h"
+#include "Weapon/WeaponComponent.h"
 #include "Weapon/WeaponPickup.h"
 #include "BPlayerCharacter.generated.h"
 
@@ -126,16 +127,11 @@ private:
 	/********************
 	*		Weapon		*
 	*********************/
-	bool CalculateFireResult(FHitResult HitResultToCheck);
-
-	UFUNCTION(Category = "Weapon")
-	void ProcessCurrentWeaponCanFire(float DeltaTime);
-
+	
 	UPROPERTY(EditAnywhere, Category = "Weapon")
-	AWeaponPickup* CurrentWeapon;
+	UWeaponComponent* WeaponComponent;
 
-	UPROPERTY(VisibleAnywhere, Category = "Weapon")
-	TArray<AWeaponPickup*> WeaponPickupArray;
+	bool CalculateFireResult(FHitResult HitResultToCheck);
 
 	UPROPERTY(EditAnywhere, Category = "Weapon")
 	float DropSpawnDistance = 25.f;

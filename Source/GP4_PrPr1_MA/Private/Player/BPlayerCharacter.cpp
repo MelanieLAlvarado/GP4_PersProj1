@@ -33,6 +33,7 @@ ABPlayerCharacter::ABPlayerCharacter()
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCharacterMovement()->RotationRate = FRotator(1200.f);
 	AdsComponent = CreateDefaultSubobject<UAdsComponent>("ADS Component");
+	WeaponComponent = CreateDefaultSubobject<UWeaponComponent>("Weapon Component");
 	//OnWeaponUpdated.AddUObject(this, &ABPlayerCharacter::WeponUpdated);
 	//OnWeaponUpdatedDynamic.AddDynamic(this, &ABPlayerCharacter::WeaponUpdatedDynamic);
 }//Target Arm Length = 500 | Socket Offset = FVector(0, 75, 0) 
@@ -76,7 +77,7 @@ void ABPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 void ABPlayerCharacter::Tick(float DeltaTime)
 {
-	ProcessCurrentWeaponCanFire(DeltaTime);
+
 }
 
 UCameraComponent* ABPlayerCharacter::GetViewCamera()
@@ -115,10 +116,10 @@ void ABPlayerCharacter::HandleMoveInput(const FInputActionValue& InputActionValu
 
 void ABPlayerCharacter::HandleFireInput(const FInputActionValue& InputActionValue)
 {
-	if (!CurrentWeapon)
+	if (!WeaponComponent)
 		return;
 
-	if (!CurrentWeapon->TryFireWeapon())
+	if (!WeaponComponent->TryFireWeapon())
 		return;
 
 	//send values into handle fire input
@@ -158,10 +159,12 @@ void ABPlayerCharacter::HandleInteractInput(const FInputActionValue& InputAction
 }
 void ABPlayerCharacter::HandleDropInput(const FInputActionValue& InputActionValue)
 {
-	if (!CurrentWeapon)
+	if (!WeaponComponent || !WeaponComponent->GetCurrentWeaponData())
 		return;
 
-	FActorSpawnParameters ActorSpawnParams;
+	WeaponComponent->TryDropCurrentWeapon(DropSpawnDistance);
+
+	/*FActorSpawnParameters ActorSpawnParams;
 	
 	ActorSpawnParams.SpawnCollisionHandlingOverride;
 
@@ -173,7 +176,7 @@ void ABPlayerCharacter::HandleDropInput(const FInputActionValue& InputActionValu
 	{
 		PickupActor->InitializeWithDataAsset();
 		CurrentWeapon = NULL;
-	}
+	}*/
 }
 
 void ABPlayerCharacter::HandleAimInputHold(const FInputActionValue& InputActionValue)
@@ -194,10 +197,10 @@ void ABPlayerCharacter::HandleAimInputReleased(const FInputActionValue& InputAct
 
 void ABPlayerCharacter::HandleReloadInput(const FInputActionValue& InputActionValue)
 {
-	if (!CurrentWeapon)
+	if (!WeaponComponent)
 		return;
-
-	CurrentWeapon->ReloadWeapon();
+	
+	WeaponComponent->ReloadWeapon();
 }
 
 FVector ABPlayerCharacter::GetLookRightDirection() const
@@ -221,11 +224,11 @@ bool ABPlayerCharacter::TryCanPickup(class APickup* Pickup)
 	
 	//DropCurrent Weapon?
 	
-	if (WeaponPickup)
+	if (WeaponPickup && WeaponComponent)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Weapon found!"));
-		CurrentWeapon = WeaponPickup;
-		WeaponPickupArray.Add(WeaponPickup);
+		WeaponComponent->SetCurrentWeapon(WeaponPickup);
+		//WeaponPickupArray.Add(WeaponPickup);
 		return true;
 	}
 	UE_LOG(LogTemp, Warning, TEXT("Cannot Pickup"));
@@ -253,9 +256,4 @@ bool ABPlayerCharacter::CalculateFireResult(FHitResult HitResult)
 	}
 	DrawDebugLine(GetWorld(), PlayerLineEnd, PlayerLineStart, FColor::Red, true, 3.f);
 	return true;
-}
-
-void ABPlayerCharacter::ProcessCurrentWeaponCanFire(float DeltaTime)//alternately handle through anim event
-{
-
 }

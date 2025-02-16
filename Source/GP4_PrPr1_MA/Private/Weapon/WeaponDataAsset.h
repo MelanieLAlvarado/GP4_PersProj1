@@ -27,7 +27,7 @@ public:
 	const UImage* GetWeaponIcon() { return WeaponIcon; };
 
 	UFUNCTION()
-	UStaticMeshComponent* GetStaticMesh() { return PickupMesh; };
+	UStaticMesh* GetStaticMesh() { return PickupMesh; };
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
@@ -40,5 +40,5 @@ protected:
 	const UImage* WeaponIcon;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Pickup")
-	UStaticMeshComponent* PickupMesh;
+	UStaticMesh* PickupMesh;
 };
