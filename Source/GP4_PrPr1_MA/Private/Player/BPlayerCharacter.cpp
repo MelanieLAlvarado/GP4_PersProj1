@@ -147,7 +147,10 @@ void ABPlayerCharacter::HandleFireInput(const FInputActionValue& InputActionValu
 	{
 		return;
 	}
-	
+	WeaponComponent->StartRecoil();
+
+	//AddControllerPitchInput(-1.0f);//recoil test
+
 	/*APlayerController* PlayerController = GetController<APlayerController>();
 	if (DamageWidgetClass != NULL && PlayerController != NULL)
 	{ 

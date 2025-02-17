@@ -103,10 +103,34 @@ void UWeaponComponent::TryDropCurrentWeapon()
 	if (PickupActor != NULL)
 	{
 		PickupActor->InitializeWithDataAsset();
-		//update current ammo count too
+		//update current ammo count too so asset "remembers"
 		PickupActor->SetCurrentAmmo(CurrentAmmo);
 		CurrentAmmo = 0;
 		WeaponData = NULL;
 		UpdateWeaponWidget();
 	}
+}
+
+void UWeaponComponent::StartRecoil()
+{
+	GetWorld()->GetTimerManager().ClearTimer(RecoilTimerHandle);
+	GetWorld()->GetTimerManager().ClearTimer(EndRecoilTimerHandle);
+
+	GetWorld()->GetTimerManager().SetTimer(RecoilTimerHandle, this, &UWeaponComponent::ProcessRecoil, 0.01f, true);
+	GetWorld()->GetTimerManager().SetTimer(EndRecoilTimerHandle, this, &UWeaponComponent::EndRecoil, 0.1f, false);
+}
+
+void UWeaponComponent::ProcessRecoil()
+{
+	APawn* OwnerCharacter = Cast<APawn>(GetOwner());
+	if (OwnerCharacter)
+	{
+		OwnerCharacter->AddControllerPitchInput(-WeaponData->GetRecoilStrength());
+	}
+}
+
+void UWeaponComponent::EndRecoil()
+{
+	GetWorld()->GetTimerManager().ClearTimer(RecoilTimerHandle);
+	GetWorld()->GetTimerManager().ClearTimer(EndRecoilTimerHandle);
 }

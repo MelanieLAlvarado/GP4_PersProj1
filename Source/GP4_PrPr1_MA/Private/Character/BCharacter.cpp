@@ -14,7 +14,7 @@ ABCharacter::ABCharacter()
 
 void ABCharacter::ServerSideInit()
 {
-	
+
 }
 
 void ABCharacter::ClientSideInit()

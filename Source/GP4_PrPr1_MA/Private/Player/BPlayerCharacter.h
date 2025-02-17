@@ -52,6 +52,9 @@ private:
 	/*UPROPERTY()
 	ABPlayerController* PlayerController;*/
 
+	UPROPERTY(EditDefaultsOnly, Category = "View");
+	TSubclassOf<class UCameraShakeBase> CameraRecoil;
+
 	/********************
 	*		Camera		*
 	*********************/
@@ -135,6 +138,9 @@ private:
 	/********************
 	*		Weapon		*
 	*********************/
+
+
+	FTimerHandle TimerHandle;
 	
 	UPROPERTY(EditAnywhere, Category = "Weapon")
 	UWeaponComponent* WeaponComponent;

@@ -18,7 +18,10 @@ class UWeaponDataAsset : public UDataAsset
 
 public:
 	UFUNCTION()
-	float GetDamageToDeal() { return DamageToDeal; };
+	const float GetDamageToDeal() { return DamageToDeal; };
+	
+	UFUNCTION()
+	const float GetRecoilStrength() { return RecoilStrength; };
 
 	UFUNCTION()
 	const int GetMaxAmmo() { return MaxAmmo; };
@@ -32,6 +35,9 @@ public:
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
 	float DamageToDeal;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
+	float RecoilStrength;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
 	int MaxAmmo;

@@ -49,7 +49,20 @@ public:
 
 	UFUNCTION()
 	UWeaponDataAsset* GetCurrentWeaponData() { return WeaponData; };
+
+	UFUNCTION()
+	void StartRecoil();
 private:
+	UFUNCTION()
+	void ProcessRecoil();
+
+	UFUNCTION()
+	void EndRecoil();
+
+	FTimerHandle RecoilTimerHandle;
+
+	FTimerHandle EndRecoilTimerHandle;
+
 	UPROPERTY()
 	UWeaponInfoWidget* WeaponInfoWidget;
 
