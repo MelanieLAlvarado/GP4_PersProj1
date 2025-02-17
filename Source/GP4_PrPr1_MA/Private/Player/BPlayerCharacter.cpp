@@ -2,6 +2,7 @@
 
 
 #include "Player/BPlayerCharacter.h"
+#include "Blueprint/WidgetLayoutLibrary.h"
 #include "Camera/CameraComponent.h" 
 #include "Components/AdsComponent.h"
 #include "Weapon/WeaponComponent.h"
@@ -15,6 +16,8 @@
 #include "Pickup/Pickup.h"
 #include "Target/Target.h"
 #include "Weapon/WeaponDataAsset.h"
+#include "Widget/DamageIndicatorWidget.h"
+#include "Widget/GameplayWidget.h"
 #include "Widget/WeaponInfoWidget.h"
 
 #define ECC_Target ECC_GameTraceChannel1
@@ -143,7 +146,23 @@ void ABPlayerCharacter::HandleFireInput(const FInputActionValue& InputActionValu
 	if (!CalculateFireResult(HitResult))
 	{
 		return;
-	}	
+	}
+	
+	/*APlayerController* PlayerController = GetController<APlayerController>();
+	if (DamageWidgetClass != NULL && PlayerController != NULL)
+	{ 
+		UDamageIndicatorWidget* DamageWidget = CreateWidget<UDamageIndicatorWidget>(PlayerController, DamageWidgetClass);
+
+		FVector2D ScreenLocation;
+
+		float ScreenSize = UWidgetLayoutLibrary::GetViewportScale(GetWorld());
+		PlayerController->ProjectWorldLocationToScreen(HitResult.ImpactPoint, ScreenLocation, false);
+		//DamageWidget->SetPositionInViewport(ScreenLocation);
+
+		DamageWidget->AddToViewport();
+		DamageWidget->SetRenderTranslation(ScreenLocation * FMath::Pow(ScreenSize, -1.0));
+	}*/
+
 	UE_LOG(LogTemp, Warning, TEXT("Fired Successfully"));
 	//process target
 	AActor* HitActor = HitResult.GetActor();
@@ -236,7 +255,7 @@ bool ABPlayerCharacter::CalculateFireResult(FHitResult HitResult)
 	const FVector CamLineStart = ViewCam->GetComponentLocation();
 	const FVector CamLineEnd = CamLineStart + ViewCam->GetForwardVector() * FireDistance;
 	if (!GetWorld()->LineTraceSingleByChannel(HitResult, CamLineStart, CamLineEnd, ECC_Target))
-	{
+	{//calculating from camera straight onwards
 		return false;
 	}
 	DrawDebugLine(GetWorld(), CamLineStart, CamLineEnd, FColor::Blue, true, 3.f);
@@ -245,7 +264,7 @@ bool ABPlayerCharacter::CalculateFireResult(FHitResult HitResult)
 	const FVector PlayerLineEnd = HitResult.ImpactPoint;
 
 	if (!GetWorld()->LineTraceSingleByChannel(HitResult, PlayerLineStart, PlayerLineEnd, ECC_Target))
-	{
+	{//calculating from player to camera hit line
 		return false;
 	}
 	DrawDebugLine(GetWorld(), PlayerLineEnd, PlayerLineStart, FColor::Red, true, 3.f);

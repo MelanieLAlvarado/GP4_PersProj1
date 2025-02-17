@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "BPlayerController.h"
 #include "CoreMinimal.h"
 #include "Character/BCharacter.h"
 #include "Components/AdsComponent.h"
@@ -48,6 +49,9 @@ public:
 	void SetInteractable(AActor* InteractableToSet);
 
 private:
+	/*UPROPERTY()
+	ABPlayerController* PlayerController;*/
+
 	/********************
 	*		Camera		*
 	*********************/
@@ -137,4 +141,7 @@ private:
 
 	bool CalculateFireResult(FHitResult HitResultToCheck);
 
+
+	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
+	TSubclassOf<class UDamageIndicatorWidget> DamageWidgetClass; 
 };
