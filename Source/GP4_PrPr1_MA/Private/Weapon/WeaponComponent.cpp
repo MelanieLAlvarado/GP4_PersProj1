@@ -2,7 +2,11 @@
 
 #include "Weapon/WeaponComponent.h"
 #include "Components/TargetComponent.h"
+#include "Components/TimelineComponent.h"
 #include "CoreMinimal.h"
+#include "Curves/CurveFloat.h"
+
+#define GET_FUNCTION_NAME(function) #function
 
 // Sets default values for this component's properties
 UWeaponComponent::UWeaponComponent()
@@ -21,7 +25,14 @@ void UWeaponComponent::BeginPlay()
 	Super::BeginPlay();
 
 	// ...
-
+	OwnerPawn = Cast<APawn>(GetOwner());
+	if (FloatCurve)
+	{
+		FOnTimelineFloat TimelineCallback;
+		FString ProcessRecoilName = GET_FUNCTION_NAME(ProcessRecoil);
+		TimelineCallback.BindUFunction(this, FName(ProcessRecoilName));
+		RecoilTimeline.AddInterpFloat(FloatCurve, TimelineCallback);
+	}
 }
 
 
@@ -31,6 +42,10 @@ void UWeaponComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	// ...
+	if (bIsTimelinePlaying)
+	{
+		RecoilTimeline.TickTimeline(DeltaTime);
+	}
 }
 
 void UWeaponComponent::SetWeaponInfoWidget(UWeaponInfoWidget* WeaponWidget)
@@ -162,21 +177,27 @@ void UWeaponComponent::TryDropCurrentWeapon()
 
 void UWeaponComponent::StartRecoil()
 {
-	GetWorld()->GetTimerManager().SetTimer(RecoilTimerHandle, this, &UWeaponComponent::ProcessRecoil, 0.01f, true);
-	GetWorld()->GetTimerManager().SetTimer(EndRecoilTimerHandle, this, &UWeaponComponent::EndRecoil, 0.1f, false);
+	GetWorld()->GetTimerManager().SetTimer(EndRecoilTimerHandle, this, &UWeaponComponent::EndRecoil, 0.2f, false);
+
+	bIsTimelinePlaying = true;
+	RecoilTimeline.PlayFromStart();
 }
 
-void UWeaponComponent::ProcessRecoil()
+void UWeaponComponent::ProcessRecoil(float RawValue)
 {
-	APawn* OwnerCharacter = Cast<APawn>(GetOwner());
-	if (OwnerCharacter)
+	if (OwnerPawn && FloatCurve)
 	{
-		OwnerCharacter->AddControllerPitchInput(-WeaponData->GetRecoilStrength());
+		UE_LOG(LogTemp, Warning, TEXT("RawVal: %f"), RawValue);
+		float RecoilValue = WeaponData->GetRecoilStrength() * RawValue;
+		OwnerPawn->AddControllerPitchInput(-RecoilValue);
 	}
+	return;
 }
 
 void UWeaponComponent::EndRecoil()
 {
-	GetWorld()->GetTimerManager().ClearTimer(RecoilTimerHandle);
 	GetWorld()->GetTimerManager().ClearTimer(EndRecoilTimerHandle);
+
+	bIsTimelinePlaying = false;
+	RecoilTimeline.Stop();
 }

@@ -5,6 +5,7 @@
 #include "Camera/CameraComponent.h"
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Components/TimelineComponent.h"
 #include "Weapon/WeaponDataAsset.h"
 #include "Weapon/WeaponPickup.h"
 #include "Widget/WeaponInfoWidget.h"
@@ -52,25 +53,39 @@ public:
 	UWeaponDataAsset* GetCurrentWeaponData() { return WeaponData; };
 
 private:
+	APawn* OwnerPawn;
+	/************************************
+	*		Line Trace/ Fire Weapon		*
+	*************************************/
 	UFUNCTION()
 	bool CalculateFireResult(UCameraComponent* ViewCam, ECollisionChannel TargetChannel, FHitResult& HitResult);
 
 	UFUNCTION()
 	void ProcessHitActor(FHitResult HitResult);
 
+	/********************
+	*		Recoil		*
+	*********************/
+
 	UFUNCTION()
 	void StartRecoil();
 
 	UFUNCTION()
-	void ProcessRecoil();
+	void ProcessRecoil(float RawValue);
 
+	FTimeline RecoilTimeline;
+	UPROPERTY(EditDefaultsOnly, Category = "Recoil")
+	UCurveFloat* FloatCurve;
+	bool bIsTimelinePlaying;
+
+	FTimerHandle EndRecoilTimerHandle;
 	UFUNCTION()
 	void EndRecoil();
 
 
-	FTimerHandle RecoilTimerHandle;
-
-	FTimerHandle EndRecoilTimerHandle;
+	/********************************
+	*		Weapon Info/Data		*
+	*********************************/
 
 	UPROPERTY()
 	UWeaponInfoWidget* WeaponInfoWidget;
