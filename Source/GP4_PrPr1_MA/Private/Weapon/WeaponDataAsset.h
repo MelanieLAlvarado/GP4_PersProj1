@@ -24,6 +24,9 @@ public:
 	const float GetRecoilStrength() { return RecoilStrength; };
 
 	UFUNCTION()
+	const float GetWeaponRange() { return WeaponRange; };
+
+	UFUNCTION()
 	const int GetMaxAmmo() { return MaxAmmo; };
 
 	UFUNCTION()
@@ -40,11 +43,10 @@ protected:
 	float RecoilStrength;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
+	float WeaponRange;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
 	int MaxAmmo;
-
-	/*UPROPERTY(EditDefaultsOnly, Category = "Weapon")
-	const UImage* WeaponIcon;*/
-
 
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
 	UTexture2D* WeaponIconTexture;

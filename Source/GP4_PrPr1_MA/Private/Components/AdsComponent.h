@@ -27,6 +27,9 @@ public:
 	void SetIsAimingState(bool StateToSet);
 
 private:
+	/*UPROPERTY()
+	FTimeline AdsTimeline;*/
+
 	UPROPERTY()
 	class ABPlayerCharacter* OwnerPlayerCharacter;
 

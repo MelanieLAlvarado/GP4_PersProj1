@@ -82,7 +82,7 @@ bool UWeaponComponent::TryFireWeapon(FHitResult HitResult, UCameraComponent* Vie
 }
 bool UWeaponComponent::CalculateFireResult(UCameraComponent* ViewCam, ECollisionChannel TargetChannel, FHitResult& HitResult)
 {
-	float FireDistance = 1000.0f;//should move to either the 
+	float FireDistance = WeaponData->GetWeaponRange();//should move to either the 
 
 	const FVector CamLineStart = ViewCam->GetComponentLocation();
 	const FVector CamLineEnd = CamLineStart + ViewCam->GetForwardVector() * FireDistance;

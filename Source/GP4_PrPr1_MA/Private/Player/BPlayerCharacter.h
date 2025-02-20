@@ -23,6 +23,9 @@ class ABPlayerCharacter : public ABCharacter
 	GENERATED_BODY()
 public:
 	ABPlayerCharacter();
+
+	virtual void BeginPlay() override;
+
 	virtual void PawnClientRestart() override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
@@ -49,6 +52,9 @@ public:
 	void SetInteractable(AActor* InteractableToSet);
 
 private:
+	UFUNCTION()
+	void SetupLateInputAttachments(class UInputComponent* PlayerInputComponent);
+
 	/*UPROPERTY()
 	ABPlayerController* PlayerController;*/
 
@@ -68,7 +74,7 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "View")
 	float CamBoomYOffset = 0.0f;
 	
-	UPROPERTY(VisibleDefaultsOnly, Category = "View")
+	UPROPERTY(VisibleAnywhere, Category = "View")
 	class UAdsComponent* AdsComponent;
 
 	/********************
@@ -88,7 +94,13 @@ private:
 	class UInputAction* FireInputAction;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* ReloadInputAction;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputAction* AimInputAction;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* EndAimInputAction;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputAction* InteractInputAction;
@@ -96,11 +108,7 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputAction* DropCurrentInputAction;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Input")
-	class UInputAction* EndAimInputAction;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Input")
-	class UInputAction* ReloadInputAction;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputMappingContext* GameplayInputMappingContext;
@@ -144,7 +152,4 @@ private:
 	
 	UPROPERTY(EditAnywhere, Category = "Weapon")
 	UWeaponComponent* WeaponComponent;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
-	TSubclassOf<class UDamageIndicatorWidget> DamageWidgetClass; 
 };

@@ -15,6 +15,16 @@ UAdsComponent::UAdsComponent()
 	PrimaryComponentTick.bCanEverTick = true;
 
 	// ...
+
+}
+
+
+// Called when the game starts
+void UAdsComponent::BeginPlay()
+{
+	Super::BeginPlay();
+
+	// ...
 	if (!GetOwner())
 		return;
 
@@ -31,27 +41,16 @@ UAdsComponent::UAdsComponent()
 }
 
 
-// Called when the game starts
-void UAdsComponent::BeginPlay()
-{
-	Super::BeginPlay();
-
-	// ...
-
-}
-
-
 // Called every frame
 void UAdsComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	// ...
 	ProcessCameraLerp(DeltaTime);
 }
 void UAdsComponent::SetIsAimingState(bool StateToSet)
-{
-	
+{//
+	UE_LOG(LogTemp, Warning, TEXT("%s"), StateToSet ? TEXT("True") : TEXT("False"));
 	bIsAiming = StateToSet;
 	bIsViewLerp = true;
 	//GetWorld()->GetTimerManager().SetTimerForNextTick(this, &UAdsComponent::UpdateCameraLerp); // could do this instead of ticking.

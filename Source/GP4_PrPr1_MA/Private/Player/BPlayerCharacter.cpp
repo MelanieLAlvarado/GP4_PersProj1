@@ -15,7 +15,6 @@
 #include "Kismet/GameplayStatics.h"
 #include "Pickup/Pickup.h"
 #include "Weapon/WeaponDataAsset.h"
-#include "Widget/DamageIndicatorWidget.h"
 #include "Widget/GameplayWidget.h"
 #include "Widget/WeaponInfoWidget.h"
 
@@ -36,11 +35,18 @@ ABPlayerCharacter::ABPlayerCharacter()
 
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCharacterMovement()->RotationRate = FRotator(1200.f);
-	AdsComponent = CreateDefaultSubobject<UAdsComponent>("ADS Component");
+	AdsComponent = CreateDefaultSubobject<UAdsComponent>("Ads Component");
 	WeaponComponent = CreateDefaultSubobject<UWeaponComponent>("Weapon Component");
-	//OnWeaponUpdated.AddUObject(this, &ABPlayerCharacter::WeponUpdated);
-	//OnWeaponUpdatedDynamic.AddDynamic(this, &ABPlayerCharacter::WeaponUpdatedDynamic);
-}//Target Arm Length = 500 | Socket Offset = FVector(0, 75, 0) 
+}
+void ABPlayerCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+	if (AdsComponent)
+		UE_LOG(LogTemp, Warning, TEXT("Begin play (ADS Check: Successful)!"));
+
+	UE_LOG(LogTemp, Warning, TEXT("Begin play (ADS Check: nothing)!"));
+}
+//Target Arm Length = 500 | Socket Offset = FVector(0, 75, 0) 
 
 void ABPlayerCharacter::PawnClientRestart()
 {
@@ -72,10 +78,19 @@ void ABPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 		EnhancedInputComponent->BindAction(DropCurrentInputAction, ETriggerEvent::Triggered, this, &ABPlayerCharacter::HandleDropInput);
 
 		if (AdsComponent)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("ADS Binded!"));
 			EnhancedInputComponent->BindAction(AimInputAction, ETriggerEvent::Triggered, 
 				this, &ABPlayerCharacter::HandleAimInputHold);
 			EnhancedInputComponent->BindAction(EndAimInputAction, ETriggerEvent::Triggered, 
 				this, &ABPlayerCharacter::HandleAimInputReleased);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("ADS not found before Binding!..."));
+			FTimerHandle LateSetupHandle;
+			GetWorldTimerManager().SetTimer(LateSetupHandle, [this, PlayerInputComponent]() {SetupLateInputAttachments(PlayerInputComponent); }, 0.2f, false, -1.0f);
+		}
 	}
 }
 
@@ -111,6 +126,19 @@ void ABPlayerCharacter::SetInteractable(AActor* InteractableToSet)
 	Interactable = InteractableToSet;
 }
 
+void ABPlayerCharacter::SetupLateInputAttachments(UInputComponent* PlayerInputComponent)
+{
+	UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent);
+	if (AdsComponent)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("ADS Binded!"));
+		EnhancedInputComponent->BindAction(AimInputAction, ETriggerEvent::Triggered,
+			this, &ABPlayerCharacter::HandleAimInputHold);
+		EnhancedInputComponent->BindAction(EndAimInputAction, ETriggerEvent::Triggered,
+			this, &ABPlayerCharacter::HandleAimInputReleased);
+	}
+}
+
 void ABPlayerCharacter::HandleLookInput(const FInputActionValue& InputActionValue)
 {
 	FVector2D InputValue = InputActionValue.Get<FVector2D>();
@@ -136,29 +164,7 @@ void ABPlayerCharacter::HandleFireInput(const FInputActionValue& InputActionValu
 		return;
 
 	FHitResult HitResult;
-	if (!WeaponComponent->TryFireWeapon(HitResult, ViewCam, ECC_Target))
-		return;
-	UE_LOG(LogTemp, Warning, TEXT("TryFire HitActor: %s"), *HitResult.ToString());
-	//send values into handle fire input
-
-
-
-	//AddControllerPitchInput(-1.0f);//recoil test
-
-	/*APlayerController* PlayerController = GetController<APlayerController>();
-	if (DamageWidgetClass != NULL && PlayerController != NULL)
-	{ 
-		UDamageIndicatorWidget* DamageWidget = CreateWidget<UDamageIndicatorWidget>(PlayerController, DamageWidgetClass);
-
-		FVector2D ScreenLocation;
-
-		float ScreenSize = UWidgetLayoutLibrary::GetViewportScale(GetWorld());
-		PlayerController->ProjectWorldLocationToScreen(HitResult.ImpactPoint, ScreenLocation, false);
-		//DamageWidget->SetPositionInViewport(ScreenLocation);
-
-		DamageWidget->AddToViewport();
-		DamageWidget->SetRenderTranslation(ScreenLocation * FMath::Pow(ScreenSize, -1.0));
-	}*/
+	WeaponComponent->TryFireWeapon(HitResult, ViewCam, ECC_Target);
 }
 
 void ABPlayerCharacter::HandleInteractInput(const FInputActionValue& InputActionValue)
@@ -171,9 +177,6 @@ void ABPlayerCharacter::HandleInteractInput(const FInputActionValue& InputAction
 	{
 		InteractInterface->Interact(this);
 	}
-
-	//OnWeaponUpdated.Broadcast(1,2);
-	//OnWeaponUpdatedDynamic.Broadcast(1,2);
 }
 void ABPlayerCharacter::HandleDropInput(const FInputActionValue& InputActionValue)
 {
@@ -185,14 +188,25 @@ void ABPlayerCharacter::HandleDropInput(const FInputActionValue& InputActionValu
 
 void ABPlayerCharacter::HandleAimInputHold(const FInputActionValue& InputActionValue)
 {
-	AdsComponent->SetIsAimingState(true);
+	UE_LOG(LogTemp, Warning, TEXT("Aim"));
+	if (AdsComponent)
+	{
+		AdsComponent->SetIsAimingState(true);
+	}
+	
 	GetCharacterMovement()->bOrientRotationToMovement = false;
 	bUseControllerRotationYaw = true;
 }
 
 void ABPlayerCharacter::HandleAimInputReleased(const FInputActionValue& InputActionValue)
 {
-	AdsComponent->SetIsAimingState(false);
+	UE_LOG(LogTemp, Warning, TEXT("Aim done"));
+
+	if (AdsComponent)
+	{
+		AdsComponent->SetIsAimingState(false);
+	}
+	
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	bUseControllerRotationYaw = false;
 }
