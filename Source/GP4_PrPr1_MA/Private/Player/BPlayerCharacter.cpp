@@ -85,12 +85,6 @@ void ABPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 			EnhancedInputComponent->BindAction(EndAimInputAction, ETriggerEvent::Triggered, 
 				this, &ABPlayerCharacter::HandleAimInputReleased);
 		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("ADS not found before Binding!..."));
-			FTimerHandle LateSetupHandle;
-			GetWorldTimerManager().SetTimer(LateSetupHandle, [this, PlayerInputComponent]() {SetupLateInputAttachments(PlayerInputComponent); }, 0.2f, false, -1.0f);
-		}
 	}
 }
 
@@ -124,19 +118,6 @@ USpringArmComponent* ABPlayerCharacter::GetCameraBoom()
 void ABPlayerCharacter::SetInteractable(AActor* InteractableToSet)
 {
 	Interactable = InteractableToSet;
-}
-
-void ABPlayerCharacter::SetupLateInputAttachments(UInputComponent* PlayerInputComponent)
-{
-	UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent);
-	if (AdsComponent)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("ADS Binded!"));
-		EnhancedInputComponent->BindAction(AimInputAction, ETriggerEvent::Triggered,
-			this, &ABPlayerCharacter::HandleAimInputHold);
-		EnhancedInputComponent->BindAction(EndAimInputAction, ETriggerEvent::Triggered,
-			this, &ABPlayerCharacter::HandleAimInputReleased);
-	}
 }
 
 void ABPlayerCharacter::HandleLookInput(const FInputActionValue& InputActionValue)

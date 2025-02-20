@@ -52,12 +52,6 @@ public:
 	void SetInteractable(AActor* InteractableToSet);
 
 private:
-	UFUNCTION()
-	void SetupLateInputAttachments(class UInputComponent* PlayerInputComponent);
-
-	/*UPROPERTY()
-	ABPlayerController* PlayerController;*/
-
 	UPROPERTY(EditDefaultsOnly, Category = "View");
 	TSubclassOf<class UCameraShakeBase> CameraRecoil;
 
