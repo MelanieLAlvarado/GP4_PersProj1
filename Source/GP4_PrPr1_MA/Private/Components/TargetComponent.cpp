@@ -15,7 +15,7 @@ UTargetComponent::UTargetComponent()
 	PrimaryComponentTick.bCanEverTick = true;
 
 	// ...
-
+	//GetOwner()->CreateDefaultSubobject<UStaticMeshComponent>("Static Mesh Component");
 
 }
 
