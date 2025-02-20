@@ -136,18 +136,13 @@ void ABPlayerCharacter::HandleFireInput(const FInputActionValue& InputActionValu
 	if (!WeaponComponent)
 		return;
 
-	if (!WeaponComponent->TryFireWeapon())
-		return;
-
-	//send values into handle fire input
-	float FireDistance = 1000.0f;
-
 	FHitResult HitResult;
-	if (!CalculateFireResult(HitResult))
-	{
+	if (!WeaponComponent->TryFireWeapon(HitResult, ViewCam, ECC_Target))
 		return;
-	}
-	WeaponComponent->StartRecoil();
+	UE_LOG(LogTemp, Warning, TEXT("TryFire HitActor: %s"), *HitResult.ToString());
+	//send values into handle fire input
+
+
 
 	//AddControllerPitchInput(-1.0f);//recoil test
 
@@ -165,18 +160,6 @@ void ABPlayerCharacter::HandleFireInput(const FInputActionValue& InputActionValu
 		DamageWidget->AddToViewport();
 		DamageWidget->SetRenderTranslation(ScreenLocation * FMath::Pow(ScreenSize, -1.0));
 	}*/
-
-	UE_LOG(LogTemp, Warning, TEXT("Fired Successfully"));
-	//process target
-	AActor* HitActor = HitResult.GetActor();
-	if (!HitActor)
-		return;
-	
-	ATarget* Target = Cast<ATarget>(HitActor);
-	if (!Target)
-		return;
-
-	HitActor->Destroy();
 }
 
 void ABPlayerCharacter::HandleInteractInput(const FInputActionValue& InputActionValue)
@@ -249,27 +232,4 @@ bool ABPlayerCharacter::TryCanPickup(class APickup* Pickup)
 	}
 	UE_LOG(LogTemp, Warning, TEXT("Cannot Pickup"));
 	return false;
-}
-
-bool ABPlayerCharacter::CalculateFireResult(FHitResult HitResult)
-{
-	float FireDistance = 1000.0f;
-
-	const FVector CamLineStart = ViewCam->GetComponentLocation();
-	const FVector CamLineEnd = CamLineStart + ViewCam->GetForwardVector() * FireDistance;
-	if (!GetWorld()->LineTraceSingleByChannel(HitResult, CamLineStart, CamLineEnd, ECC_Target))
-	{//calculating from camera straight onwards
-		return false;
-	}
-	DrawDebugLine(GetWorld(), CamLineStart, CamLineEnd, FColor::Blue, true, 3.f);
-
-	const FVector PlayerLineStart = GetActorLocation();
-	const FVector PlayerLineEnd = HitResult.ImpactPoint;
-
-	if (!GetWorld()->LineTraceSingleByChannel(HitResult, PlayerLineStart, PlayerLineEnd, ECC_Target))
-	{//calculating from player to camera hit line
-		return false;
-	}
-	DrawDebugLine(GetWorld(), PlayerLineEnd, PlayerLineStart, FColor::Red, true, 3.f);
-	return true;
 }

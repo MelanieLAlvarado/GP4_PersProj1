@@ -2,6 +2,8 @@
 
 
 #include "Target/Target.h"
+//#include "Components/WidgetComponent.h"
+#include "Target/DamageIndicator.h"
 
 // Sets default values
 ATarget::ATarget()
@@ -23,5 +25,19 @@ void ATarget::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void ATarget::HitAction(UWeaponDataAsset* WeaponHitData, FHitResult HitResult)
+{
+	UE_LOG(LogTemp, Warning, TEXT("Hit Action (Target)"));
+	/*UWidgetComponent* DamageIndicatorComponent = NewObject<UWidgetComponent>(this);
+
+	DamageIndicatorComponent->SetWidget(DamageIndicatorWidget);*/
+	if (DamageIndicatorClass && WeaponHitData)
+	{
+		ADamageIndicator* DamageIndicator = GetWorld()->SpawnActor<ADamageIndicator>(DamageIndicatorClass, 
+			HitResult.ImpactPoint, FRotator::ZeroRotator);
+		DamageIndicator->InitializeDamageIndicator(WeaponHitData->GetDamageToDeal());
+	}
 }
 

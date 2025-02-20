@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "Camera/CameraComponent.h"
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Weapon/WeaponDataAsset.h"
@@ -41,7 +42,7 @@ public:
 	void UpdateWeaponWidget();
 
 	UFUNCTION()
-	bool TryFireWeapon();
+	bool TryFireWeapon(FHitResult HitResult, UCameraComponent* ViewCam, ECollisionChannel TargetChannel);
 	UFUNCTION()
 	void ReloadWeapon();
 	UFUNCTION()
@@ -50,14 +51,22 @@ public:
 	UFUNCTION()
 	UWeaponDataAsset* GetCurrentWeaponData() { return WeaponData; };
 
+private:
+	UFUNCTION()
+	bool CalculateFireResult(UCameraComponent* ViewCam, ECollisionChannel TargetChannel, FHitResult& HitResult);
+
+	UFUNCTION()
+	void ProcessHitActor(FHitResult HitResult);
+
 	UFUNCTION()
 	void StartRecoil();
-private:
+
 	UFUNCTION()
 	void ProcessRecoil();
 
 	UFUNCTION()
 	void EndRecoil();
+
 
 	FTimerHandle RecoilTimerHandle;
 

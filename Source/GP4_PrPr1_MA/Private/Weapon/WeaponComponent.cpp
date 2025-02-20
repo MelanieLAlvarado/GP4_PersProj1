@@ -2,6 +2,7 @@
 
 #include "Weapon/WeaponComponent.h"
 #include "CoreMinimal.h"
+#include "Target/Target.h"
 
 // Sets default values for this component's properties
 UWeaponComponent::UWeaponComponent()
@@ -56,7 +57,7 @@ void UWeaponComponent::UpdateWeaponWidget()
 	OnWeaponUpdated.Broadcast(WeaponData, CurrentAmmo);
 }
 
-bool UWeaponComponent::TryFireWeapon()
+bool UWeaponComponent::TryFireWeapon(FHitResult HitResult, UCameraComponent* ViewCam, ECollisionChannel TargetChannel)
 {
 	if (!bCanFire || !WeaponData)
 		return false;
@@ -67,10 +68,58 @@ bool UWeaponComponent::TryFireWeapon()
 	if (CurrentAmmo > WeaponData->GetMaxAmmo())
 		CurrentAmmo = WeaponData->GetMaxAmmo();
 
+	if (!CalculateFireResult(ViewCam, TargetChannel, HitResult))
+	{
+		return false;
+	}
+
 	CurrentAmmo--;
+	ProcessHitActor(HitResult);
+	StartRecoil();
 	UpdateWeaponWidget();
 	UE_LOG(LogTemp, Warning, TEXT("%i / %i"), CurrentAmmo, WeaponData->GetMaxAmmo());
 	return true;
+}
+bool UWeaponComponent::CalculateFireResult(UCameraComponent* ViewCam, ECollisionChannel TargetChannel, FHitResult& HitResult)
+{
+	float FireDistance = 1000.0f;//should move to either the 
+
+	const FVector CamLineStart = ViewCam->GetComponentLocation();
+	const FVector CamLineEnd = CamLineStart + ViewCam->GetForwardVector() * FireDistance;
+	if (!GetWorld()->LineTraceSingleByChannel(HitResult, CamLineStart, CamLineEnd, TargetChannel))
+	{//calculating from camera straight onwards
+		return false;
+	}
+	DrawDebugLine(GetWorld(), CamLineStart, CamLineEnd, FColor::Blue, true, 3.f);
+
+	const FVector OwnerLineStart = GetOwner()->GetActorLocation();
+	const FVector OwnerLineEnd = HitResult.ImpactPoint;
+
+	if (!GetWorld()->LineTraceSingleByChannel(HitResult, OwnerLineStart, OwnerLineEnd, TargetChannel))
+	{//calculating from player to camera hit line
+		return false;
+	}
+	DrawDebugLine(GetWorld(), OwnerLineEnd, OwnerLineStart, FColor::Red, true, 3.f);
+	return true;
+}
+
+void UWeaponComponent::ProcessHitActor(FHitResult HitResult)
+{
+	AActor* HitActor = HitResult.GetActor();
+
+	if (!IsValid(HitActor))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("No Hit Actor. "));
+		return;
+	}
+
+	ATarget* Target = Cast<ATarget>(HitActor);
+	if (!Target)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("No Target Script"));
+		return;
+	}
+	Target->HitAction(WeaponData, HitResult);
 }
 
 void UWeaponComponent::ReloadWeapon()

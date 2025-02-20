@@ -5,10 +5,6 @@
 #include "Components/TextBlock.h"
 #include "CoreMinimal.h"
 
-void UDamageIndicatorWidget::NativeConstruct()
-{
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &UDamageIndicatorWidget::TimerEnd, TimerDuration, false);
-}
 
 void UDamageIndicatorWidget::DisplayDamage(float DamageDealt)
 {
@@ -28,9 +24,3 @@ void UDamageIndicatorWidget::DisplayDamage(float DamageDealt)
 
 }
 
-void UDamageIndicatorWidget::TimerEnd()
-{
-	GetWorld()->GetTimerManager().ClearTimer(TimerHandle);
-	//RemoveFromViewport();
-	//destroy here?
-}

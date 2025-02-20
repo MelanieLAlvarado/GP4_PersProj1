@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Weapon/WeaponDataAsset.h"
 #include "Target.generated.h"
 
 UCLASS()
@@ -23,4 +24,9 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	virtual void HitAction(UWeaponDataAsset* WeaponHitData, FHitResult HitResult);
+
+private:
+	UPROPERTY(EditDefaultsOnly, Category = "Target")
+	TSubclassOf<class ADamageIndicator> DamageIndicatorClass;
 };

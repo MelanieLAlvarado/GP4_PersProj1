@@ -145,9 +145,6 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Weapon")
 	UWeaponComponent* WeaponComponent;
 
-	bool CalculateFireResult(FHitResult HitResultToCheck);
-
-
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
 	TSubclassOf<class UDamageIndicatorWidget> DamageWidgetClass; 
 };
