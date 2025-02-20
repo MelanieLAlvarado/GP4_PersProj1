@@ -1,8 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Weapon/WeaponComponent.h"
+#include "Components/TargetComponent.h"
 #include "CoreMinimal.h"
-#include "Target/Target.h"
 
 // Sets default values for this component's properties
 UWeaponComponent::UWeaponComponent()
@@ -113,7 +113,7 @@ void UWeaponComponent::ProcessHitActor(FHitResult HitResult)
 		return;
 	}
 
-	ATarget* Target = Cast<ATarget>(HitActor);
+	UTargetComponent* Target = Cast<UTargetComponent>(HitActor->GetComponentByClass(UTargetComponent::StaticClass()));
 	if (!Target)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("No Target Script"));

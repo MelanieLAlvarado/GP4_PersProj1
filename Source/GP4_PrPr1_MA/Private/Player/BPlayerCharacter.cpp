@@ -14,7 +14,6 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Pickup/Pickup.h"
-#include "Target/Target.h"
 #include "Weapon/WeaponDataAsset.h"
 #include "Widget/DamageIndicatorWidget.h"
 #include "Widget/GameplayWidget.h"
