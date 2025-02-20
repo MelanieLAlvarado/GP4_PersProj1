@@ -191,7 +191,6 @@ void UWeaponComponent::ProcessRecoil(float RawValue)
 		float RecoilValue = WeaponData->GetRecoilStrength() * RawValue;
 		OwnerPawn->AddControllerPitchInput(-RecoilValue);
 	}
-	return;
 }
 
 void UWeaponComponent::EndRecoil()
