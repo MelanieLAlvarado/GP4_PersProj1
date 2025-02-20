@@ -22,9 +22,19 @@ void AWeaponPickup::InitializeWithDataAsset()
 	if (WeaponData && WeaponData->GetStaticMesh())
 	{
 		PickupMesh->SetStaticMesh(WeaponData->GetStaticMesh());
-		PickupMesh->SetSimulatePhysics(false);//May change later
+
+		PickupMesh->SetSimulatePhysics(true);//May change later
+		PickupMesh->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+		FTimerHandle GravityTimerHandle;
+		GetWorldTimerManager().SetTimer(GravityTimerHandle, this, &AWeaponPickup::DisableGravityAfterTimer, GravityTimerDuration, false);
 		//connect delegates for ui
 		//UpdateWeaponWidget();
 	}
+}
+
+void AWeaponPickup::DisableGravityAfterTimer()
+{
+	PickupMesh->SetSimulatePhysics(false);
+	PickupMesh->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 }
 

@@ -162,9 +162,6 @@ void UWeaponComponent::TryDropCurrentWeapon()
 
 void UWeaponComponent::StartRecoil()
 {
-	GetWorld()->GetTimerManager().ClearTimer(RecoilTimerHandle);
-	GetWorld()->GetTimerManager().ClearTimer(EndRecoilTimerHandle);
-
 	GetWorld()->GetTimerManager().SetTimer(RecoilTimerHandle, this, &UWeaponComponent::ProcessRecoil, 0.01f, true);
 	GetWorld()->GetTimerManager().SetTimer(EndRecoilTimerHandle, this, &UWeaponComponent::EndRecoil, 0.1f, false);
 }

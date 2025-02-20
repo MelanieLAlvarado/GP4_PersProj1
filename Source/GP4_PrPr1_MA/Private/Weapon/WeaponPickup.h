@@ -29,7 +29,13 @@ public:
 	UFUNCTION()
 	UWeaponDataAsset* GetWeaponData() { return WeaponData; }
 
+	UFUNCTION()
+	void DisableGravityAfterTimer();
+
 private:
+	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
+	float GravityTimerDuration = 1.0f;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
 	int CurrentAmmo;
 
