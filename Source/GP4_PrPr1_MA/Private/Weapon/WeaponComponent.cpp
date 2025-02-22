@@ -174,6 +174,7 @@ void UWeaponComponent::ReloadWeapon()
 
 	if (CurrentAmmo == WeaponData->GetMaxAmmo())
 		return;
+	bCanFire = false;
 
 	PlayAnimMontage(ReloadMontage);
 
