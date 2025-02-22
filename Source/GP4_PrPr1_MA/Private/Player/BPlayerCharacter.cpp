@@ -144,8 +144,7 @@ void ABPlayerCharacter::HandleFireInput(const FInputActionValue& InputActionValu
 	if (!WeaponComponent)
 		return;
 
-	FHitResult HitResult;
-	WeaponComponent->TryFireWeapon(HitResult, ViewCam, ECC_Target);
+	WeaponComponent->TryFireWeapon(ViewCam, ECC_Target);
 }
 
 void ABPlayerCharacter::HandleInteractInput(const FInputActionValue& InputActionValue)

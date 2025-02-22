@@ -35,6 +35,9 @@ public:
 	UFUNCTION()
 	UStaticMesh* GetStaticMesh() { return PickupMesh; };
 
+	UFUNCTION()
+	TSubclassOf<AActor> GetWeaponToAttachHold() { return WeaponToAttachHold; }
+
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
 	float DamageToDeal;
@@ -53,4 +56,7 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
 	UStaticMesh* PickupMesh;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
+	TSubclassOf<AActor> WeaponToAttachHold;
 };

@@ -40,8 +40,5 @@ private:
 	int CurrentAmmo;
 
 	UPROPERTY(VisibleAnywhere, Category = "Weapon")
-	bool bCanFire = true;
-
-	UPROPERTY(VisibleAnywhere, Category = "Weapon")
 	UWeaponDataAsset* WeaponData;
 };

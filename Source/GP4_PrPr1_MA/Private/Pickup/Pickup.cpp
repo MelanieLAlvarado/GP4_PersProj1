@@ -45,8 +45,7 @@ void APickup::BeginPlay()
 {
 	Super::BeginPlay();
 	SetPickupActive(true);
-	UE_LOG(LogTemp, Warning, TEXT("Begin Play Pickup!"));
-
+	//UE_LOG(LogTemp, Warning, TEXT("Begin Play Pickup!"));
 }
 
 // Called every frame
@@ -58,7 +57,7 @@ void APickup::Tick(float DeltaTime)
 
 void APickup::OnOverlapBegin(AActor* OverlappedActor, AActor* OtherActor)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Overlap started!"));
+	//UE_LOG(LogTemp, Warning, TEXT("Overlap started!"));
 	ABPlayerCharacter* OverlappedCharacter = Cast<ABPlayerCharacter>(OtherActor);
 	if (OverlappedCharacter && IsPickupActive())
 	{

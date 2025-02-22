@@ -43,7 +43,9 @@ public:
 	void UpdateWeaponWidget();
 
 	UFUNCTION()
-	bool TryFireWeapon(FHitResult HitResult, UCameraComponent* ViewCam, ECollisionChannel TargetChannel);
+	bool TryFireWeapon(UCameraComponent* ViewCam, ECollisionChannel TargetChannel);
+	UFUNCTION()
+	void ProcessCanFire();
 	UFUNCTION()
 	void ReloadWeapon();
 	UFUNCTION()
@@ -53,7 +55,7 @@ public:
 	UWeaponDataAsset* GetCurrentWeaponData() { return WeaponData; };
 
 private:
-	APawn* OwnerPawn;
+	ACharacter* OwnerCharacter;
 	/************************************
 	*		Line Trace/ Fire Weapon		*
 	*************************************/
@@ -73,11 +75,17 @@ private:
 	UFUNCTION()
 	void ProcessRecoil(float RawValue);
 
+	/*UPROPERTY(EditDefaultsOnly, Category = "Recoil")
+	TSubclassOf<UCameraShakeBase> FireCamShake;*/
+
+	UPROPERTY()
 	FTimeline RecoilTimeline;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Recoil")
 	UCurveFloat* FloatCurve;
 	bool bIsTimelinePlaying;
 
+	UPROPERTY()
 	FTimerHandle EndRecoilTimerHandle;
 	UFUNCTION()
 	void EndRecoil();
@@ -90,11 +98,17 @@ private:
 	UPROPERTY()
 	UWeaponInfoWidget* WeaponInfoWidget;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
+	UPROPERTY(EditAnywhere, Category = "Weapon")
+	FName AttachWeaponSocketName;
+
+	UPROPERTY()
+	AActor* HeldWeapon;
+
+	UPROPERTY(VisibleAnywhere, Category = "Weapon")
 	int CurrentAmmo;
 
 	UPROPERTY(EditAnywhere, Category = "Weapon")
-	float DropSpawnDistance = 25.f;
+	float DropSpawnDistance = 125.f;
 
 	UPROPERTY(VisibleAnywhere, Category = "Weapon")
 	bool bCanFire = true;
@@ -104,6 +118,9 @@ private:
 
 	UPROPERTY(VisibleAnywhere, Category = "Weapon")
 	TSubclassOf<class AWeaponPickup> WeaponPickupClass;
+
+	UFUNCTION()
+	void AttachWeaponToSocket();
 
 	/************************
 	*		Animations		*
