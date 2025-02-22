@@ -5,10 +5,10 @@
 #include "Components/TimelineComponent.h"
 #include "CoreMinimal.h"
 #include "Curves/CurveFloat.h"
+#include "GameFramework/Character.h"
 
 #define GET_FUNCTION_NAME(function) #function
 
-// Sets default values for this component's properties
 UWeaponComponent::UWeaponComponent()
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
@@ -19,7 +19,6 @@ UWeaponComponent::UWeaponComponent()
 }
 
 
-// Called when the game starts
 void UWeaponComponent::BeginPlay()
 {
 	Super::BeginPlay();
@@ -32,6 +31,12 @@ void UWeaponComponent::BeginPlay()
 		FString ProcessRecoilName = GET_FUNCTION_NAME(ProcessRecoil);
 		TimelineCallback.BindUFunction(this, FName(ProcessRecoilName));
 		RecoilTimeline.AddInterpFloat(FloatCurve, TimelineCallback);
+	}
+
+	ACharacter* OwnerCharacter = Cast<ACharacter>(GetOwner());
+	if (OwnerCharacter)
+	{
+		AnimInstance = OwnerCharacter->GetMesh()->GetAnimInstance();
 	}
 }
 
@@ -78,21 +83,27 @@ bool UWeaponComponent::TryFireWeapon(FHitResult HitResult, UCameraComponent* Vie
 		return false;
 
 	if (CurrentAmmo <= 0)
+	{
+		PlayAnimMontage(ShootNoReloadMontage);
 		return false;
+	}
 
 	if (CurrentAmmo > WeaponData->GetMaxAmmo())
 		CurrentAmmo = WeaponData->GetMaxAmmo();
+
+	PlayAnimMontage(ShootMontage);
+
+	CurrentAmmo--;
+	StartRecoil();
+	UpdateWeaponWidget();
 
 	if (!CalculateFireResult(ViewCam, TargetChannel, HitResult))
 	{
 		return false;
 	}
 
-	CurrentAmmo--;
 	ProcessHitActor(HitResult);
-	StartRecoil();
-	UpdateWeaponWidget();
-	UE_LOG(LogTemp, Warning, TEXT("%i / %i"), CurrentAmmo, WeaponData->GetMaxAmmo());
+	//UE_LOG(LogTemp, Warning, TEXT("%i / %i"), CurrentAmmo, WeaponData->GetMaxAmmo());
 	return true;
 }
 bool UWeaponComponent::CalculateFireResult(UCameraComponent* ViewCam, ECollisionChannel TargetChannel, FHitResult& HitResult)
@@ -145,9 +156,11 @@ void UWeaponComponent::ReloadWeapon()
 	if (CurrentAmmo == WeaponData->GetMaxAmmo())
 		return;
 
+	PlayAnimMontage(ReloadMontage);
+
 	CurrentAmmo = WeaponData->GetMaxAmmo();
 	UpdateWeaponWidget();
-	UE_LOG(LogTemp, Warning, TEXT("%i / %i"), CurrentAmmo, WeaponData->GetMaxAmmo());
+	//UE_LOG(LogTemp, Warning, TEXT("%i / %i"), CurrentAmmo, WeaponData->GetMaxAmmo());
 }
 
 void UWeaponComponent::TryDropCurrentWeapon()
@@ -162,7 +175,11 @@ void UWeaponComponent::TryDropCurrentWeapon()
 
 	const FVector SpawnLocation = owner->GetActorLocation() + (owner->GetActorForwardVector() * DropSpawnDistance);
 
-	AWeaponPickup* PickupActor = GetWorld()->SpawnActor<AWeaponPickup>(WeaponPickupClass, SpawnLocation, FRotator::ZeroRotator);
+	AWeaponPickup* PickupActor = NULL;
+	if (WeaponPickupClass)
+	{
+		PickupActor = GetWorld()->SpawnActor<AWeaponPickup>(WeaponPickupClass, SpawnLocation, FRotator::ZeroRotator);
+	}
 
 	if (PickupActor != NULL)
 	{
@@ -187,7 +204,7 @@ void UWeaponComponent::ProcessRecoil(float RawValue)
 {
 	if (OwnerPawn && FloatCurve)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("RawVal: %f"), RawValue);
+		//UE_LOG(LogTemp, Warning, TEXT("RawVal: %f"), RawValue);
 		float RecoilValue = WeaponData->GetRecoilStrength() * RawValue;
 		OwnerPawn->AddControllerPitchInput(-RecoilValue);
 	}
@@ -199,4 +216,17 @@ void UWeaponComponent::EndRecoil()
 
 	bIsTimelinePlaying = false;
 	RecoilTimeline.Stop();
+}
+
+void UWeaponComponent::PlayAnimMontage(UAnimMontage* AnimMontageToPlay)
+{
+	if (AnimMontageToPlay && AnimInstance)
+	{
+		AnimInstance->Montage_Play(AnimMontageToPlay, 1.0f);
+		UE_LOG(LogTemp, Warning, TEXT("AnimMontage is Here!! Montage: %s"), *AnimMontageToPlay->GetName());
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("AnimMontage is Null!!"));
+	}
 }

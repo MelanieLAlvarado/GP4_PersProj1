@@ -17,7 +17,7 @@ ADamageIndicator::ADamageIndicator()
 void ADamageIndicator::BeginPlay()
 {
 	Super::BeginPlay();
-	UE_LOG(LogTemp, Warning, TEXT("Damage Indicator (Actor) is in scene!"));
+	//UE_LOG(LogTemp, Warning, TEXT("Damage Indicator (Actor) is in scene!"));
 }
 
 // Called every frame
@@ -33,7 +33,7 @@ void ADamageIndicator::InitializeDamageIndicator(float DamageToDisplay)
 	{
 		return;
 	}
-	UE_LOG(LogTemp, Warning, TEXT("Damage Indicator (Actor) is initialized!"));
+	//UE_LOG(LogTemp, Warning, TEXT("Damage Indicator (Actor) is initialized!"));
 
 	WidgetComponent->SetWidget(DamageIndicatorWidget);
 	if (UDamageIndicatorWidget* DamageWidget = Cast<UDamageIndicatorWidget>(DamageIndicatorWidget))

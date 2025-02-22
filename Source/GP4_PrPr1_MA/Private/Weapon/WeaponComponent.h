@@ -104,4 +104,21 @@ private:
 
 	UPROPERTY(VisibleAnywhere, Category = "Weapon")
 	TSubclassOf<class AWeaponPickup> WeaponPickupClass;
+
+	/************************
+	*		Animations		*
+	*************************/
+private:
+	UAnimInstance* AnimInstance;
+
+	void PlayAnimMontage(UAnimMontage* AnimMontageToPlay);
+
+	UPROPERTY(EditDefaultsOnly, Category = "Animation")
+	UAnimMontage* ShootMontage;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Animation")
+	UAnimMontage* ReloadMontage;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Animation")
+	UAnimMontage* ShootNoReloadMontage;
 };
