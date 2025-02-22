@@ -102,15 +102,15 @@ bool UWeaponComponent::TryFireWeapon(UCameraComponent* ViewCam, ECollisionChanne
 	StartRecoil();
 	UpdateWeaponWidget();
 
-	/*if (FireCamShake)
+	if (FireCamShake)
 	{
-		APlayerController* OwnerController = Cast<APlayerController>(GetOwner());
+		APlayerController* OwnerController = Cast<APlayerController>(OwnerCharacter->GetController());
 		if (OwnerController)
 		{
 			OwnerController->ClientStartCameraShake(FireCamShake);
 			UE_LOG(LogTemp, Warning, TEXT("Cam Shake &&& PLayer Controller here"));
 		}
-	}*/
+	}
 	FHitResult HitResult;
 	if (!CalculateFireResult(ViewCam, TargetChannel, HitResult))
 	{
@@ -228,7 +228,7 @@ void UWeaponComponent::StartRecoil()
 
 void UWeaponComponent::ProcessRecoil(float RawValue)
 {
-	if (OwnerCharacter && FloatCurve)
+	if (OwnerCharacter && FloatCurve && WeaponData)
 	{
 		//UE_LOG(LogTemp, Warning, TEXT("RawVal: %f"), RawValue);
 		float RecoilValue = WeaponData->GetRecoilStrength() * RawValue;
@@ -246,7 +246,7 @@ void UWeaponComponent::EndRecoil()
 
 void UWeaponComponent::AttachWeaponToSocket()
 {
-	if (!OwnerCharacter || !WeaponData->GetWeaponToAttachHold())
+	if (!OwnerCharacter || !WeaponData || !WeaponData->GetWeaponToAttachHold())
 		return;
 
 	if (const USkeletalMeshSocket* AttachWeaponSocket = OwnerCharacter->GetMesh()->GetSocketByName(AttachWeaponSocketName))

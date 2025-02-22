@@ -75,8 +75,8 @@ private:
 	UFUNCTION()
 	void ProcessRecoil(float RawValue);
 
-	/*UPROPERTY(EditDefaultsOnly, Category = "Recoil")
-	TSubclassOf<UCameraShakeBase> FireCamShake;*/
+	UPROPERTY(EditDefaultsOnly, Category = "Recoil")
+	TSubclassOf<UCameraShakeBase> FireCamShake;
 
 	UPROPERTY()
 	FTimeline RecoilTimeline;
