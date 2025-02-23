@@ -28,12 +28,12 @@ ABPlayerCharacter::ABPlayerCharacter()
 	CameraBoom->TargetArmLength = 500.f;
 	CameraBoom->SetRelativeLocation(FVector(0, CamBoomYOffset, 0));
 
-	bUseControllerRotationYaw = false;
+	bUseControllerRotationYaw = true;
 
 	ViewCam = CreateDefaultSubobject<UCameraComponent>("View Cam");
 	ViewCam->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 
-	GetCharacterMovement()->bOrientRotationToMovement = true;
+	GetCharacterMovement()->bOrientRotationToMovement = false;
 	GetCharacterMovement()->RotationRate = FRotator(1200.f);
 	AdsComponent = CreateDefaultSubobject<UAdsComponent>("Ads Component");
 	WeaponComponent = CreateDefaultSubobject<UWeaponComponent>("Weapon Component");
@@ -41,12 +41,8 @@ ABPlayerCharacter::ABPlayerCharacter()
 void ABPlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	if (AdsComponent)
-		UE_LOG(LogTemp, Warning, TEXT("Begin play (ADS Check: Successful)!"));
 
-	UE_LOG(LogTemp, Warning, TEXT("Begin play (ADS Check: nothing)!"));
 }
-//Target Arm Length = 500 | Socket Offset = FVector(0, 75, 0) 
 
 void ABPlayerCharacter::PawnClientRestart()
 {
@@ -122,6 +118,11 @@ void ABPlayerCharacter::SetInteractable(AActor* InteractableToSet)
 
 void ABPlayerCharacter::HandleLookInput(const FInputActionValue& InputActionValue)
 {
+	if (GetVelocity().Length() <= 0)
+	{
+		GetCharacterMovement()->bOrientRotationToMovement = true;
+		bUseControllerRotationYaw = false;
+	}
 	FVector2D InputValue = InputActionValue.Get<FVector2D>();
 	AddControllerYawInput(InputValue.X);
 	AddControllerPitchInput(-InputValue.Y);
@@ -134,9 +135,34 @@ void ABPlayerCharacter::HandleMoveInput(const FInputActionValue& InputActionValu
 	{
 		return;
 	}
+	InterpCharacterRotation();
 	InputValue.Normalize();
 
 	AddMovementInput(GetLookRightDirection() * InputValue.X + GetMoveForwardDirection() * InputValue.Y);
+}
+
+void ABPlayerCharacter::InterpCharacterRotation()
+{
+	if (bUseControllerRotationYaw)
+		return;
+
+	GetCharacterMovement()->bOrientRotationToMovement = false; //allowing the interp
+	FRotator CurrentRotation = GetActorRotation();
+
+	float TargetYaw = GetController()->GetControlRotation().Yaw;
+	FRotator TargetRotation = CurrentRotation;
+	TargetRotation.Yaw = TargetYaw;
+
+	FRotator NewRotation = CurrentRotation;
+	
+	NewRotation = FMath::RInterpTo(CurrentRotation, TargetRotation, GetWorld()->DeltaTimeSeconds, InterpCharacterRotationSpeed);
+	SetActorRotation(NewRotation);
+
+	if (FMath::IsNearlyEqual(CurrentRotation.Yaw, TargetRotation.Yaw, 5.f))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("NearEqual"));
+		bUseControllerRotationYaw = true;
+	}
 }
 
 void ABPlayerCharacter::HandleFireInput(const FInputActionValue& InputActionValue)
@@ -168,27 +194,20 @@ void ABPlayerCharacter::HandleDropInput(const FInputActionValue& InputActionValu
 
 void ABPlayerCharacter::HandleAimInputHold(const FInputActionValue& InputActionValue)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Aim"));
 	if (AdsComponent)
 	{
 		AdsComponent->SetIsAimingState(true);
 	}
-	
 	GetCharacterMovement()->bOrientRotationToMovement = false;
 	bUseControllerRotationYaw = true;
 }
 
 void ABPlayerCharacter::HandleAimInputReleased(const FInputActionValue& InputActionValue)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Aim done"));
-
 	if (AdsComponent)
 	{
 		AdsComponent->SetIsAimingState(false);
 	}
-	
-	GetCharacterMovement()->bOrientRotationToMovement = true;
-	bUseControllerRotationYaw = false;
 }
 
 void ABPlayerCharacter::HandleReloadInput(const FInputActionValue& InputActionValue)

@@ -110,6 +110,10 @@ private:
 	void HandleLookInput(const struct FInputActionValue& InputActionValue);
 	void HandleMoveInput(const struct FInputActionValue& InputActionValue);
 
+	void InterpCharacterRotation();
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	float InterpCharacterRotationSpeed = 3.0f;
+
 	void HandleFireInput(const struct FInputActionValue& InputActionValue);
 	void HandleInteractInput(const struct FInputActionValue& InputActionValue);
 

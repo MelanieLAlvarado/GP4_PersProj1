@@ -48,6 +48,7 @@ void UAdsComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorCo
 
 	ProcessCameraLerp(DeltaTime);
 }
+
 void UAdsComponent::SetIsAimingState(bool StateToSet)
 {//
 	UE_LOG(LogTemp, Warning, TEXT("%s"), StateToSet ? TEXT("True") : TEXT("False"));
