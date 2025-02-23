@@ -255,6 +255,11 @@ void UWeaponComponent::AttachWeaponToSocket()
 
 		HeldWeapon = GetWorld()->SpawnActor<AActor>(WeaponData->GetWeaponToAttachHold(), SocketTransform);
 
+		UStaticMeshComponent* HeldWeaponMesh = HeldWeapon->GetComponentByClass<UStaticMeshComponent>();
+
+		HeldWeaponMesh->SetSimulatePhysics(false);
+		HeldWeaponMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
 		FAttachmentTransformRules WeaponAttachmentRules = FAttachmentTransformRules(EAttachmentRule::SnapToTarget,
 			EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, true);
 

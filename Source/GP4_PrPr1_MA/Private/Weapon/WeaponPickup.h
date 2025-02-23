@@ -34,11 +34,13 @@ public:
 
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
-	float GravityTimerDuration = 1.0f;
+	float GravityTimerDuration = 0.5f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
 	int CurrentAmmo;
 
 	UPROPERTY(VisibleAnywhere, Category = "Weapon")
 	UWeaponDataAsset* WeaponData;
+
+	FTimerHandle GravityTimerHandle;
 };
