@@ -160,7 +160,6 @@ void ABPlayerCharacter::InterpCharacterRotation()
 
 	if (FMath::IsNearlyEqual(CurrentRotation.Yaw, TargetRotation.Yaw, 5.f))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("NearEqual"));
 		bUseControllerRotationYaw = true;
 	}
 }

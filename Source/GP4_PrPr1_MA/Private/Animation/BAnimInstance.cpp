@@ -33,6 +33,10 @@ void UBAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		FRotator AimRotation = OwnerCharacter->GetBaseAimRotation();
 		LookRotationDelta = UKismetMathLibrary::NormalizedDeltaRotator(AimRotation, BodyRotation);
 
+		if (GetIsNotMoving())
+		{
+			return;
+		}
 
 		FVector RawVelocity = OwnerCharacter->GetVelocity();
 		FVector OwnerForward = OwnerCharacter->GetActorForwardVector();
@@ -43,10 +47,7 @@ void UBAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		WalkYFromForward = FVector::DotProduct(OwnerForward, RawVelocity);
 		WalkXFromForward = FVector::DotProduct(OwnerRight, RawVelocity);
 
-		if (Speed > 0)
-		{
-			LastWalkDirection = FVector(WalkXFromForward, WalkYFromForward, 0);
-		}
+		LastWalkDirection = FVector(WalkXFromForward, WalkYFromForward, 0);
 	}
 	if (OwnerCharacterMovementComponent)
 	{
