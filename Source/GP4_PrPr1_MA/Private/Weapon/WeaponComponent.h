@@ -82,7 +82,7 @@ private:
 	FTimeline RecoilTimeline;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Recoil")
-	UCurveFloat* FloatCurve;
+	UCurveFloat* RecoilCurve;
 	bool bIsTimelinePlaying;
 
 	UPROPERTY()

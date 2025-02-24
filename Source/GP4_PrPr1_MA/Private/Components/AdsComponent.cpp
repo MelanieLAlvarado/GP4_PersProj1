@@ -2,10 +2,15 @@
 
 
 #include "Components/AdsComponent.h"
+#include "Components/TimelineComponent.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Player/BPlayerCharacter.h"
+
+#define GET_FUNCTION_NAME(function) #function
+
+
 
 // Sets default values for this component's properties
 UAdsComponent::UAdsComponent()
@@ -38,6 +43,18 @@ void UAdsComponent::BeginPlay()
 		ViewCam->SetFieldOfView(DefaultFOV);
 	}
 	CameraBoom = OwnerPlayerCharacter->GetCameraBoom();
+
+	if (AdsCurve)
+	{
+		FString UpdateCameraLerpName = GET_FUNCTION_NAME(UpdateCameraLerp);
+
+		FOnTimelineFloat TimelineCallback;
+		TimelineCallback.BindUFunction(this, FName("UpdateCameraLerp"));
+		AdsTimeline.AddInterpFloat(AdsCurve, TimelineCallback);
+
+		UE_LOG(LogTemp, Warning, TEXT("Function: %s"), *UpdateCameraLerpName);
+	}
+	LerpAlpha = 0.f;
 }
 
 
@@ -46,18 +63,33 @@ void UAdsComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorCo
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	ProcessCameraLerp(DeltaTime);
+	if (AdsTimeline.IsPlaying())
+	{
+		AdsTimeline.TickTimeline(DeltaTime);
+		UE_LOG(LogTemp, Warning, TEXT("TimeVal: %f"), AdsTimeline.GetPlaybackPosition());
+	}
+
+	//ProcessCameraLerp(DeltaTime);
 }
 
 void UAdsComponent::SetIsAimingState(bool StateToSet)
 {//
 	UE_LOG(LogTemp, Warning, TEXT("%s"), StateToSet ? TEXT("True") : TEXT("False"));
 	bIsAiming = StateToSet;
+
 	bIsViewLerp = true;
-	//GetWorld()->GetTimerManager().SetTimerForNextTick(this, &UAdsComponent::UpdateCameraLerp); // could do this instead of ticking.
+	if (bIsAiming)
+	{
+		AdsTimeline.Play();
+	}
+	else
+	{
+		AdsTimeline.Play();
+		AdsTimeline.Reverse();
+	}
 }
 
-void UAdsComponent::ProcessCameraLerp(float DeltaTime)
+/*void UAdsComponent::ProcessCameraLerp(float DeltaTime)
 {
 	if (!bIsViewLerp)
 	{
@@ -83,8 +115,8 @@ void UAdsComponent::ProcessCameraLerp(float DeltaTime)
 		LerpAlpha = 0.f;
 	}
 	/*UE_LOG(LogTemp, Warning, TEXT("Fov: %f"), CurrentFOV);
-	UE_LOG(LogTemp, Warning, TEXT("Boom: %f"), CameraBoomCurrentLength);*/
-}
+	UE_LOG(LogTemp, Warning, TEXT("Boom: %f"), CameraBoomCurrentLength);
+}*/
 
 void UAdsComponent::LerpCameraBoomLength(float StartValue, float EndValue)
 {
@@ -98,8 +130,11 @@ void UAdsComponent::LerpFOV(float StartValue, float EndValue)
 	ViewCam->SetFieldOfView(CurrentFOV);
 }
 
-void UAdsComponent::UpdateCameraLerp()
+void UAdsComponent::UpdateCameraLerp(float Value)
 {
-	GetWorld()->GetTimerManager().SetTimerForNextTick(this, &UAdsComponent::UpdateCameraLerp);
+	UE_LOG(LogTemp, Warning, TEXT("alpha: %f"), Value);
+	LerpAlpha = Value;
+	LerpCameraBoomLength(CameraBoomDefaultLength, CameraBoomAimLength);
+	LerpFOV(DefaultFOV, AimFOV);
 }
 

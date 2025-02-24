@@ -32,12 +32,12 @@ void UWeaponComponent::BeginPlay()
 		AnimInstance = OwnerCharacter->GetMesh()->GetAnimInstance();
 	}
 
-	if (FloatCurve)
+	if (RecoilCurve)
 	{
 		FOnTimelineFloat TimelineCallback;
 		FString ProcessRecoilName = GET_FUNCTION_NAME(ProcessRecoil);
 		TimelineCallback.BindUFunction(this, FName(ProcessRecoilName));
-		RecoilTimeline.AddInterpFloat(FloatCurve, TimelineCallback);
+		RecoilTimeline.AddInterpFloat(RecoilCurve, TimelineCallback);
 	}
 }
 
@@ -228,7 +228,7 @@ void UWeaponComponent::StartRecoil()
 
 void UWeaponComponent::ProcessRecoil(float RawValue)
 {
-	if (OwnerCharacter && FloatCurve && WeaponData)
+	if (OwnerCharacter && RecoilCurve && WeaponData)
 	{
 		//UE_LOG(LogTemp, Warning, TEXT("RawVal: %f"), RawValue);
 		float RecoilValue = WeaponData->GetRecoilStrength() * RawValue;

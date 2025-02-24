@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Components/TimelineComponent.h"
 #include "AdsComponent.generated.h"
 
 
@@ -39,38 +40,45 @@ private:
 	UPROPERTY()
 	class USpringArmComponent* CameraBoom;
 
-	UPROPERTY(EditDefaultsOnly, Category = "View")
+	UPROPERTY(EditDefaultsOnly, Category = "Aim Down Sights")
+	UCurveFloat* AdsCurve;
+
+	UPROPERTY()
+	FTimeline AdsTimeline;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Aim Down Sights")
 	float CameraBoomDefaultLength = 500.f;
 
-	UPROPERTY(EditDefaultsOnly, Category = "View")
+	UPROPERTY(EditDefaultsOnly, Category = "Aim Down Sights")
 	float CameraBoomAimLength = 300.f;
 
-	UPROPERTY(VisibleAnywhere, Category = "View")
+	UPROPERTY(VisibleAnywhere, Category = "Aim Down Sights")
 	float CameraBoomCurrentLength = 500.f;
 
-	UPROPERTY(EditDefaultsOnly, Category = "View")
+	UPROPERTY(EditDefaultsOnly, Category = "Aim Down Sights")
 	float DefaultFOV = 90.f;
 
-	UPROPERTY(EditDefaultsOnly, Category = "View")
+	UPROPERTY(EditDefaultsOnly, Category = "Aim Down Sights")
 	float AimFOV = 80.f;
 
-	UPROPERTY(EditDefaultsOnly, Category = "View")
+	UPROPERTY(EditDefaultsOnly, Category = "Aim Down Sights")
 	float CurrentFOV = 90.f;
 
 	float LerpAlpha = 0.f;
 
-	UPROPERTY(EditDefaultsOnly, Category = "View")
+	UPROPERTY(EditDefaultsOnly, Category = "Aim Down Sights")
 	float AimLerpMultiplier = 2.f;
 
-	void ProcessCameraLerp(float DeltaTime);
+	//void ProcessCameraLerp(float DeltaTime);
 
 	void LerpCameraBoomLength(float StartValue, float EndValue);
 	void LerpFOV(float StartValue, float EndValue);
 
-	UPROPERTY();
+	UPROPERTY()
 	bool bIsViewLerp = false;
-	UPROPERTY();
+	UPROPERTY()
 	bool bIsAiming = false;
 
-	void UpdateCameraLerp();
+	UFUNCTION()
+	void UpdateCameraLerp(float Value);
 };
