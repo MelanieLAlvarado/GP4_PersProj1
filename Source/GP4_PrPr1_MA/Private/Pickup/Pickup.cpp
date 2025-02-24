@@ -18,9 +18,10 @@ APickup::APickup()
 
 	PickupMesh->SetSimulatePhysics(true);
 
-	/*USphereComponent* SphereCollider = CreateDefaultSubobject<USphereComponent>("Sphere Collider");
-	SphereCollider->SetupAttachment(PickupMesh);
-	SphereCollider->OnComponentBeginOverlap.AddDynamic(this, &APickup::OnOverlapBegin);*/
+	SphereCollider = CreateDefaultSubobject<USphereComponent>("Sphere Collider");
+	SphereCollider->SetupAttachment(RootComponent);
+
+	//SphereCollider->OnComponentBeginOverlap.AddDynamic(this, &APickup::OnOverlapBegin);
 		//->OnComponentBeginOverlap.AddDynamic(this, &APickup::OnOverlapBegin);
 
 	OnActorBeginOverlap.AddDynamic(this, &APickup::OnOverlapBegin);
@@ -45,6 +46,14 @@ void APickup::BeginPlay()
 {
 	Super::BeginPlay();
 	SetPickupActive(true);
+
+	if (SphereCollider)
+	{
+		SphereCollider->SetSimulatePhysics(false);
+		SphereCollider->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+		SphereCollider->SetCollisionResponseToAllChannels(ECR_Ignore);
+		SphereCollider->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);
+	}
 	//UE_LOG(LogTemp, Warning, TEXT("Begin Play Pickup!"));
 }
 

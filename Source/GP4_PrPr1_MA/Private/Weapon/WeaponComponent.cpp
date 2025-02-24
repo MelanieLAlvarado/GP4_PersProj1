@@ -135,7 +135,7 @@ bool UWeaponComponent::CalculateFireResult(UCameraComponent* ViewCam, ECollision
 	{//calculating from camera straight onwards
 		return false;
 	}
-	DrawDebugLine(GetWorld(), CamLineStart, CamLineEnd, FColor::Blue, true, 3.f);
+	//DrawDebugLine(GetWorld(), CamLineStart, CamLineEnd, FColor::Blue, true, 3.f);
 
 	const FVector OwnerLineStart = GetOwner()->GetActorLocation();
 	const FVector OwnerLineEnd = HitResult.ImpactPoint;
@@ -144,7 +144,7 @@ bool UWeaponComponent::CalculateFireResult(UCameraComponent* ViewCam, ECollision
 	{//calculating from player to camera hit line
 		return false;
 	}
-	DrawDebugLine(GetWorld(), OwnerLineEnd, OwnerLineStart, FColor::Red, true, 3.f);
+	//DrawDebugLine(GetWorld(), OwnerLineEnd, OwnerLineStart, FColor::Red, true, 3.f);
 	return true;
 }
 

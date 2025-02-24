@@ -67,10 +67,11 @@ void ABPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 		EnhancedInputComponent->BindAction(JumpInputAction, ETriggerEvent::Triggered, this, &ABPlayerCharacter::Jump);
 		EnhancedInputComponent->BindAction(LookInputAction, ETriggerEvent::Triggered, this, &ABPlayerCharacter::HandleLookInput);
 		EnhancedInputComponent->BindAction(MoveInputAction, ETriggerEvent::Triggered, this, &ABPlayerCharacter::HandleMoveInput);
+		EnhancedInputComponent->BindAction(QuitInputAction, ETriggerEvent::Triggered, this, &ABPlayerCharacter::HandleQuitInput);
+
 		EnhancedInputComponent->BindAction(FireInputAction, ETriggerEvent::Triggered, this, &ABPlayerCharacter::HandleFireInput);
 		EnhancedInputComponent->BindAction(InteractInputAction, ETriggerEvent::Triggered, this, &ABPlayerCharacter::HandleInteractInput);
 		EnhancedInputComponent->BindAction(ReloadInputAction, ETriggerEvent::Triggered, this, &ABPlayerCharacter::HandleReloadInput);
-
 		EnhancedInputComponent->BindAction(DropCurrentInputAction, ETriggerEvent::Triggered, this, &ABPlayerCharacter::HandleDropInput);
 
 		if (AdsComponent)
@@ -215,6 +216,14 @@ void ABPlayerCharacter::HandleReloadInput(const FInputActionValue& InputActionVa
 		return;
 	
 	WeaponComponent->ReloadWeapon();
+}
+
+void ABPlayerCharacter::HandleQuitInput(const FInputActionValue& InputActionValue)
+{
+	if (APlayerController* PlayerController = GetController<APlayerController>())
+	{
+		PlayerController->ConsoleCommand("quit");
+	}
 }
 
 FVector ABPlayerCharacter::GetLookRightDirection() const

@@ -102,6 +102,8 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputAction* DropCurrentInputAction;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* QuitInputAction;
 
 
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
@@ -123,6 +125,8 @@ private:
 	void HandleAimInputReleased(const struct FInputActionValue& InputActionValue);
 
 	void HandleReloadInput(const struct FInputActionValue& InputActionValue);
+	
+	void HandleQuitInput(const struct FInputActionValue& InputActionValue);
 
 
 	FVector GetLookRightDirection() const;

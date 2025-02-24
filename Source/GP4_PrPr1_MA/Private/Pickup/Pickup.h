@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "Components/SphereComponent.h"
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Framework/InteractInterface.h"
@@ -42,6 +43,9 @@ private:
 	void OnPickupCollected(AActor* InteractingActor);
 
 protected:
+	UPROPERTY(EditDefaultsOnly, Category = "Pickup")
+	USphereComponent* SphereCollider;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Pickup")
 	UStaticMeshComponent* PickupMesh;
 	UPROPERTY(VisibleAnywhere, Category = "Pickup")
