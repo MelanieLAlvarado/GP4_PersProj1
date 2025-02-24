@@ -25,7 +25,6 @@ void UWeaponComponent::BeginPlay()
 	Super::BeginPlay();
 
 	// ...
-	//OwnerCharacter = Cast<APawn>(GetOwner());
 	OwnerCharacter = Cast<ACharacter>(GetOwner());
 	if (OwnerCharacter)
 	{
@@ -94,6 +93,23 @@ bool UWeaponComponent::TryFireWeapon(UCameraComponent* ViewCam, ECollisionChanne
 	if (CurrentAmmo > WeaponData->GetMaxAmmo())
 		CurrentAmmo = WeaponData->GetMaxAmmo();
 
+	ProcessFire();
+	FHitResult HitResult;
+	if (!CalculateFireResult(ViewCam, TargetChannel, HitResult))
+	{
+		return false;
+	}
+	ProcessHitActor(HitResult);
+	return true;
+}
+
+void UWeaponComponent::ProcessCanFire()
+{
+	bCanFire = true;
+}
+
+void UWeaponComponent::ProcessFire()
+{
 	bCanFire = false;
 
 	PlayAnimMontage(ShootMontage);
@@ -102,32 +118,12 @@ bool UWeaponComponent::TryFireWeapon(UCameraComponent* ViewCam, ECollisionChanne
 	StartRecoil();
 	UpdateWeaponWidget();
 
-	if (FireCamShake)
-	{
-		APlayerController* OwnerController = Cast<APlayerController>(OwnerCharacter->GetController());
-		if (OwnerController)
-		{
-			OwnerController->ClientStartCameraShake(FireCamShake);
-			UE_LOG(LogTemp, Warning, TEXT("Cam Shake &&& PLayer Controller here"));
-		}
-	}
-	FHitResult HitResult;
-	if (!CalculateFireResult(ViewCam, TargetChannel, HitResult))
-	{
-		return false;
-	}
+	TriggerCamShake();
+}
 
-	ProcessHitActor(HitResult);
-	//UE_LOG(LogTemp, Warning, TEXT("%i / %i"), CurrentAmmo, WeaponData->GetMaxAmmo());
-	return true;
-}
-void UWeaponComponent::ProcessCanFire()
-{
-	bCanFire = true;
-}
 bool UWeaponComponent::CalculateFireResult(UCameraComponent* ViewCam, ECollisionChannel TargetChannel, FHitResult& HitResult)
 {
-	float FireDistance = WeaponData->GetWeaponRange();//should move to either the 
+	float FireDistance = WeaponData->GetWeaponRange();
 
 	const FVector CamLineStart = ViewCam->GetComponentLocation();
 	const FVector CamLineEnd = CamLineStart + ViewCam->GetForwardVector() * FireDistance;
@@ -139,7 +135,6 @@ bool UWeaponComponent::CalculateFireResult(UCameraComponent* ViewCam, ECollision
 
 	const FVector OwnerLineStart = GetOwner()->GetActorLocation();
 	const FVector OwnerLineEnd = HitResult.ImpactPoint;
-
 	if (!GetWorld()->LineTraceSingleByChannel(HitResult, OwnerLineStart, OwnerLineEnd, TargetChannel))
 	{//calculating from player to camera hit line
 		return false;
@@ -174,13 +169,12 @@ void UWeaponComponent::ReloadWeapon()
 
 	if (CurrentAmmo == WeaponData->GetMaxAmmo())
 		return;
-	bCanFire = false;
 
+	bCanFire = false;
 	PlayAnimMontage(ReloadMontage);
 
 	CurrentAmmo = WeaponData->GetMaxAmmo();
 	UpdateWeaponWidget();
-	//UE_LOG(LogTemp, Warning, TEXT("%i / %i"), CurrentAmmo, WeaponData->GetMaxAmmo());
 }
 
 void UWeaponComponent::TryDropCurrentWeapon()
@@ -188,11 +182,8 @@ void UWeaponComponent::TryDropCurrentWeapon()
 	if (!WeaponPickupClass || !WeaponData)
 		return;
 	FActorSpawnParameters ActorSpawnParams;
-
 	ActorSpawnParams.SpawnCollisionHandlingOverride;
-
 	AActor* owner = GetOwner();
-
 	const FVector SpawnLocation = owner->GetActorLocation() + (owner->GetActorForwardVector() * DropSpawnDistance);
 
 	AWeaponPickup* PickupActor = NULL;
@@ -208,7 +199,6 @@ void UWeaponComponent::TryDropCurrentWeapon()
 			HeldWeapon->Destroy();
 			HeldWeapon = NULL;
 		}
-
 		PickupActor->InitializeWithDataAsset();
 		//update current ammo count too so asset "remembers"
 		PickupActor->SetCurrentAmmo(CurrentAmmo);
@@ -220,7 +210,8 @@ void UWeaponComponent::TryDropCurrentWeapon()
 
 void UWeaponComponent::StartRecoil()
 {
-	GetWorld()->GetTimerManager().SetTimer(EndRecoilTimerHandle, this, &UWeaponComponent::EndRecoil, 0.2f, false);
+	GetWorld()->GetTimerManager().SetTimer(EndRecoilTimerHandle, 
+		this, &UWeaponComponent::EndRecoil, 0.2f, false);
 
 	bIsTimelinePlaying = true;
 	RecoilTimeline.PlayFromStart();
@@ -230,9 +221,20 @@ void UWeaponComponent::ProcessRecoil(float RawValue)
 {
 	if (OwnerCharacter && RecoilCurve && WeaponData)
 	{
-		//UE_LOG(LogTemp, Warning, TEXT("RawVal: %f"), RawValue);
 		float RecoilValue = WeaponData->GetRecoilStrength() * RawValue;
 		OwnerCharacter->AddControllerPitchInput(-RecoilValue);
+	}
+}
+
+void UWeaponComponent::TriggerCamShake()
+{
+	if (FireCamShake)
+	{
+		APlayerController* OwnerController = Cast<APlayerController>(OwnerCharacter->GetController());
+		if (OwnerController)
+		{
+			OwnerController->ClientStartCameraShake(FireCamShake);
+		}
 	}
 }
 
@@ -264,7 +266,6 @@ void UWeaponComponent::AttachWeaponToSocket()
 			EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, true);
 
 		HeldWeapon->AttachToComponent(OwnerCharacter->GetMesh(), WeaponAttachmentRules, AttachWeaponSocketName);
-		//UE_LOG(LogTemp, Warning, TEXT("Weapon Attached!"));
 	}
 }
 
@@ -273,10 +274,5 @@ void UWeaponComponent::PlayAnimMontage(UAnimMontage* AnimMontageToPlay)
 	if (AnimMontageToPlay && AnimInstance)
 	{
 		AnimInstance->Montage_Play(AnimMontageToPlay, 1.0f);
-		//UE_LOG(LogTemp, Warning, TEXT("AnimMontage is Here!! Montage: %s"), *AnimMontageToPlay->GetName());
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("AnimMontage is Null!!"));
 	}
 }

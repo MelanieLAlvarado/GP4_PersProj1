@@ -49,12 +49,11 @@ void UAdsComponent::BeginPlay()
 		FString UpdateCameraLerpName = GET_FUNCTION_NAME(UpdateCameraLerp);
 
 		FOnTimelineFloat TimelineCallback;
-		TimelineCallback.BindUFunction(this, FName("UpdateCameraLerp"));
+		TimelineCallback.BindUFunction(this, FName(UpdateCameraLerpName));
 		AdsTimeline.AddInterpFloat(AdsCurve, TimelineCallback);
 
 		UE_LOG(LogTemp, Warning, TEXT("Function: %s"), *UpdateCameraLerpName);
 	}
-	LerpAlpha = 0.f;
 }
 
 
@@ -68,8 +67,6 @@ void UAdsComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorCo
 		AdsTimeline.TickTimeline(DeltaTime);
 		UE_LOG(LogTemp, Warning, TEXT("TimeVal: %f"), AdsTimeline.GetPlaybackPosition());
 	}
-
-	//ProcessCameraLerp(DeltaTime);
 }
 
 void UAdsComponent::SetIsAimingState(bool StateToSet)
@@ -89,52 +86,22 @@ void UAdsComponent::SetIsAimingState(bool StateToSet)
 	}
 }
 
-/*void UAdsComponent::ProcessCameraLerp(float DeltaTime)
+void UAdsComponent::LerpCameraBoomLength(float StartValue, float EndValue, float Value)
 {
-	if (!bIsViewLerp)
-	{
-		return;
-	}
-	LerpAlpha += DeltaTime * AimLerpMultiplier;
-
-	if (bIsAiming)
-	{
-		LerpCameraBoomLength(CameraBoomDefaultLength, CameraBoomAimLength);
-		LerpFOV(DefaultFOV, AimFOV);
-		bIsViewLerp = !(CurrentFOV <= AimFOV && CameraBoomCurrentLength <= CameraBoomAimLength);
-	}
-	else
-	{
-		LerpCameraBoomLength(CameraBoomAimLength, CameraBoomDefaultLength);
-		LerpFOV(AimFOV, DefaultFOV);
-		bIsViewLerp = !(CurrentFOV >= DefaultFOV && CameraBoomCurrentLength >= CameraBoomDefaultLength);
-	}
-
-	if (!bIsViewLerp)
-	{
-		LerpAlpha = 0.f;
-	}
-	/*UE_LOG(LogTemp, Warning, TEXT("Fov: %f"), CurrentFOV);
-	UE_LOG(LogTemp, Warning, TEXT("Boom: %f"), CameraBoomCurrentLength);
-}*/
-
-void UAdsComponent::LerpCameraBoomLength(float StartValue, float EndValue)
-{
-	CameraBoomCurrentLength = FMath::Lerp(StartValue, EndValue, LerpAlpha);
+	CameraBoomCurrentLength = FMath::Lerp(StartValue, EndValue, Value);
 	CameraBoom->TargetArmLength = CameraBoomCurrentLength;
 }
 
-void UAdsComponent::LerpFOV(float StartValue, float EndValue)
+void UAdsComponent::LerpFOV(float StartValue, float EndValue, float Value)
 {
-	CurrentFOV = FMath::Lerp(StartValue, EndValue, LerpAlpha);
+	CurrentFOV = FMath::Lerp(StartValue, EndValue, Value);
 	ViewCam->SetFieldOfView(CurrentFOV);
 }
 
 void UAdsComponent::UpdateCameraLerp(float Value)
 {
 	UE_LOG(LogTemp, Warning, TEXT("alpha: %f"), Value);
-	LerpAlpha = Value;
-	LerpCameraBoomLength(CameraBoomDefaultLength, CameraBoomAimLength);
-	LerpFOV(DefaultFOV, AimFOV);
+	LerpCameraBoomLength(CameraBoomDefaultLength, CameraBoomAimLength, Value);
+	LerpFOV(DefaultFOV, AimFOV, Value);
 }
 

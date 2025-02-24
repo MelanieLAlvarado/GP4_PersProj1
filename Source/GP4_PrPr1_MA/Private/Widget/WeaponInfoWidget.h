@@ -18,7 +18,6 @@ class UWeaponInfoWidget : public UUserWidget
 	
 public:
 	virtual void NativePreConstruct() override;
-	void InitializeWithCurrentWeapon(AWeaponPickup* WeaponPickup);
 
 	void WeaponUpdated(UWeaponDataAsset* WeaponData, int CurrentAmmoValue);
 
@@ -31,10 +30,4 @@ private:
 
 	UPROPERTY(meta=(BindWidget))
 	class UTextBlock* ValueText;
-
-	void ValueChanged(AWeaponPickup* WeaponPickup);
-	void MaxValueChanged(AWeaponPickup* WeaponPickup);
-
-	float CachedValue;
-	float CachedMaxValue;
 };

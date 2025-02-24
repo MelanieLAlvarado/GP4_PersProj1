@@ -28,9 +28,6 @@ public:
 	void SetIsAimingState(bool StateToSet);
 
 private:
-	/*UPROPERTY()
-	FTimeline AdsTimeline;*/
-
 	UPROPERTY()
 	class ABPlayerCharacter* OwnerPlayerCharacter;
 
@@ -64,15 +61,8 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Aim Down Sights")
 	float CurrentFOV = 90.f;
 
-	float LerpAlpha = 0.f;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Aim Down Sights")
-	float AimLerpMultiplier = 2.f;
-
-	//void ProcessCameraLerp(float DeltaTime);
-
-	void LerpCameraBoomLength(float StartValue, float EndValue);
-	void LerpFOV(float StartValue, float EndValue);
+	void LerpCameraBoomLength(float StartValue, float EndValue, float Value);
+	void LerpFOV(float StartValue, float EndValue, float Value);
 
 	UPROPERTY()
 	bool bIsViewLerp = false;

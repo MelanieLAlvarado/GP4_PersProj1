@@ -46,9 +46,6 @@ void UTargetComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 void UTargetComponent::HitAction(UWeaponDataAsset* WeaponHitData, FHitResult HitResult)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Hit Action (Target)"));
-	/*UWidgetComponent* DamageIndicatorComponent = NewObject<UWidgetComponent>(this);
-
-	DamageIndicatorComponent->SetWidget(DamageIndicatorWidget);*/
 	if (DamageIndicatorClass && WeaponHitData)
 	{
 		ADamageIndicator* DamageIndicator = GetWorld()->SpawnActor<ADamageIndicator>(DamageIndicatorClass,

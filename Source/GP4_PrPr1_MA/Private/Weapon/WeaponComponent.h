@@ -59,6 +59,8 @@ private:
 	/************************************
 	*		Line Trace/ Fire Weapon		*
 	*************************************/
+	void ProcessFire();
+
 	UFUNCTION()
 	bool CalculateFireResult(UCameraComponent* ViewCam, ECollisionChannel TargetChannel, FHitResult& HitResult);
 
@@ -77,6 +79,8 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Recoil")
 	TSubclassOf<UCameraShakeBase> FireCamShake;
+
+	void TriggerCamShake();
 
 	UPROPERTY()
 	FTimeline RecoilTimeline;

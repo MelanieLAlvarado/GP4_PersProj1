@@ -67,6 +67,7 @@ void ABPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 		EnhancedInputComponent->BindAction(JumpInputAction, ETriggerEvent::Triggered, this, &ABPlayerCharacter::Jump);
 		EnhancedInputComponent->BindAction(LookInputAction, ETriggerEvent::Triggered, this, &ABPlayerCharacter::HandleLookInput);
 		EnhancedInputComponent->BindAction(MoveInputAction, ETriggerEvent::Triggered, this, &ABPlayerCharacter::HandleMoveInput);
+		
 		EnhancedInputComponent->BindAction(QuitInputAction, ETriggerEvent::Triggered, this, &ABPlayerCharacter::HandleQuitInput);
 
 		EnhancedInputComponent->BindAction(FireInputAction, ETriggerEvent::Triggered, this, &ABPlayerCharacter::HandleFireInput);
@@ -156,7 +157,8 @@ void ABPlayerCharacter::InterpCharacterRotation()
 
 	FRotator NewRotation = CurrentRotation;
 	
-	NewRotation = FMath::RInterpTo(CurrentRotation, TargetRotation, GetWorld()->DeltaTimeSeconds, InterpCharacterRotationSpeed);
+	NewRotation = FMath::RInterpTo(CurrentRotation, TargetRotation, 
+		GetWorld()->DeltaTimeSeconds, InterpCharacterRotationSpeed);
 	SetActorRotation(NewRotation);
 
 	if (FMath::IsNearlyEqual(CurrentRotation.Yaw, TargetRotation.Yaw, 5.f))
@@ -178,7 +180,8 @@ void ABPlayerCharacter::HandleInteractInput(const FInputActionValue& InputAction
 	if (!Interactable)
 		return;
 
-	IInteractInterface* InteractInterface = Cast<IInteractInterface>(Interactable);
+	IInteractInterface* InteractInterface = 
+		Cast<IInteractInterface>(Interactable);
 	if (InteractInterface)
 	{
 		InteractInterface->Interact(this);
@@ -246,10 +249,8 @@ bool ABPlayerCharacter::TryCanPickup(class APickup* Pickup)
 	AWeaponPickup* WeaponPickup = Cast<AWeaponPickup>(Pickup);
 	if (WeaponPickup && WeaponComponent)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Weapon found!"));
 		WeaponComponent->SetCurrentWeapon(WeaponPickup);
 		return true;
 	}
-	UE_LOG(LogTemp, Warning, TEXT("Cannot Pickup"));
 	return false;
 }

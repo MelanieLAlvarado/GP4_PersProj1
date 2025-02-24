@@ -11,7 +11,6 @@ void UDamageIndicatorWidget::DisplayDamage(float DamageDealt)
 	if (!ValueText)
 		return;
 
-
 	float RoundedDamage = FMath::RoundToInt(DamageDealt);
 	FString DisplayDamage = FString::FromInt(RoundedDamage);
 
@@ -21,6 +20,5 @@ void UDamageIndicatorWidget::DisplayDamage(float DamageDealt)
 		DisplayDamage = FString::FromInt(RoundedDamage) + "." + FString::FromInt(DecimalDamage);
 	}
 	ValueText->SetText(FText::FromString(DisplayDamage));
-
 }
 

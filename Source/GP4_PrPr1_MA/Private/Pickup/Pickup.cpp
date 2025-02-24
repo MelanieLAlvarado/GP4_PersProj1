@@ -21,9 +21,6 @@ APickup::APickup()
 	SphereCollider = CreateDefaultSubobject<USphereComponent>("Sphere Collider");
 	SphereCollider->SetupAttachment(RootComponent);
 
-	//SphereCollider->OnComponentBeginOverlap.AddDynamic(this, &APickup::OnOverlapBegin);
-		//->OnComponentBeginOverlap.AddDynamic(this, &APickup::OnOverlapBegin);
-
 	OnActorBeginOverlap.AddDynamic(this, &APickup::OnOverlapBegin);
 	OnActorEndOverlap.AddDynamic(this, &APickup::OnOverlapEnd);
 }
@@ -37,8 +34,8 @@ void APickup::InitializeWithDataAsset()
 
 void APickup::Interact(AActor* InteractingActor)
 {
-	//interact action here.
-	OnPickupCollected(InteractingActor);//will change to press button input
+	//interact action here.//will change to press button input
+	OnPickupCollected(InteractingActor);
 }
 
 // Called when the game starts or when spawned
@@ -54,7 +51,6 @@ void APickup::BeginPlay()
 		SphereCollider->SetCollisionResponseToAllChannels(ECR_Ignore);
 		SphereCollider->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);
 	}
-	//UE_LOG(LogTemp, Warning, TEXT("Begin Play Pickup!"));
 }
 
 // Called every frame
@@ -70,7 +66,6 @@ void APickup::OnOverlapBegin(AActor* OverlappedActor, AActor* OtherActor)
 	ABPlayerCharacter* OverlappedCharacter = Cast<ABPlayerCharacter>(OtherActor);
 	if (OverlappedCharacter && IsPickupActive())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Handled Overlap!"));
 		OverlappedCharacter->SetInteractable(this);
 	}
 }
@@ -85,7 +80,7 @@ void APickup::OnOverlapEnd(AActor* OverlappedActor, AActor* OtherActor)
 }
 
 void APickup::OnPickupCollected(AActor* InteractingActor)
-{
+{//(Player pressed "interact" on default Pickup)
 	if (!IsPickupActive())
 		return;
 	if (!InteractingActor)
@@ -97,10 +92,8 @@ void APickup::OnPickupCollected(AActor* InteractingActor)
 
 	if (InteractPlayerCharacter->TryCanPickup(this))
 	{
-//		UE_LOG(LogTemp, Warning, TEXT("Class: %hs!"), ClassName);
 		SetPickupActive(false);
 		Destroy();
 	}
-	//pickup handled...
 }
 

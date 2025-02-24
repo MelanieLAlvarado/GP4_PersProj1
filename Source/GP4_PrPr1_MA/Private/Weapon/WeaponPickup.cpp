@@ -26,9 +26,8 @@ void AWeaponPickup::InitializeWithDataAsset()
 		PickupMesh->SetSimulatePhysics(true);//May change later
 		PickupMesh->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
 
-		GetWorldTimerManager().SetTimer(GravityTimerHandle, this, &AWeaponPickup::DisableGravityAfterTimer, GravityTimerDuration, true);
-		//connect delegates for ui
-		//UpdateWeaponWidget();
+		GetWorldTimerManager().SetTimer(GravityTimerHandle, this, &AWeaponPickup::DisableGravityAfterTimer, 
+			GravityTimerDuration, true);
 	}
 }
 
@@ -38,7 +37,8 @@ void AWeaponPickup::DisableGravityAfterTimer()
 	{
 		PickupMesh->SetSimulatePhysics(false);
 		PickupMesh->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-		PickupMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);
+		PickupMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, 
+			ECollisionResponse::ECR_Overlap);
 		GetWorldTimerManager().ClearTimer(GravityTimerHandle);
 	}
 }

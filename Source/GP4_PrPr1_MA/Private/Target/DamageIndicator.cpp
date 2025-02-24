@@ -24,16 +24,16 @@ void ADamageIndicator::BeginPlay()
 void ADamageIndicator::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	SetActorLocation(FVector(GetActorLocation().X, GetActorLocation().Y, GetActorLocation().Z + MoveUpSpeed));
+	SetActorLocation(FVector(GetActorLocation().X, GetActorLocation().Y, 
+		GetActorLocation().Z + MoveUpSpeed));
 }
 
 void ADamageIndicator::InitializeDamageIndicator(float DamageToDisplay)
 {
-	if (!DamageIndicatorWidget )//&& !InstigatorController)//Do we need the controllwe?
+	if (!DamageIndicatorWidget )
 	{
 		return;
 	}
-	//UE_LOG(LogTemp, Warning, TEXT("Damage Indicator (Actor) is initialized!"));
 
 	WidgetComponent->SetWidget(DamageIndicatorWidget);
 	if (UDamageIndicatorWidget* DamageWidget = Cast<UDamageIndicatorWidget>(DamageIndicatorWidget))
@@ -43,13 +43,11 @@ void ADamageIndicator::InitializeDamageIndicator(float DamageToDisplay)
 
 	WidgetComponent->SetHiddenInGame(false);
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ADamageIndicator::TimerEnd, TimerDuration, false);
-
 }
 
 void ADamageIndicator::TimerEnd()
 {
 	GetWorld()->GetTimerManager().ClearTimer(TimerHandle);
-	//RemoveFromViewport();
 	Destroy();
 }
 
